@@ -322,6 +322,83 @@
       .avatar{ width:100px; height:100px; }
     }
 
+    :root{
+      --pad-x: 20px;
+    }
+    @media (max-width: 640px){
+      :root{
+        --pad-x: max(16px, env(safe-area-inset-left, 0));
+      }
+      html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+      body{ word-break: break-word; overflow-wrap: anywhere; }
+      .wrap{ padding-inline: var(--pad-x); }
+      .hero-inner{ flex-wrap: wrap; gap: 10px; padding: 20px var(--pad-x); }
+      .title{ font-size: clamp(18px, 5.5vw, 24px); }
+      .muted{ font-size: 0.95rem; }
+    }
+
+    /* 2) Sidebar/profile stack cleanly and never overflow */
+    .side{ max-width: 100%; }
+    @media (max-width: 980px){
+      .side{
+        position: static !important; top:auto !important; z-index:1;
+        padding: 18px;
+      }
+    }
+    .profile{ align-items: center; text-align: center; }
+    .avatar{ width: clamp(96px, 28vw, 120px); height: clamp(96px, 28vw, 120px); }
+
+    /* 3) CTA buttons wrap gracefully */
+    .cta{ display:flex; flex-wrap: wrap; gap: 8px; }
+    .btn{ min-width: 0; white-space: normal; }  /* allow wrapping on tiny screens */
+    .btn svg{ width: 18px; height: 18px; }
+
+    /* 4) Keep long author lines / links from breaking layout */
+    .item > div{ min-width: 0; }
+    .item a{ word-break: break-word; overflow-wrap: anywhere; }
+
+    /* Optional nicer style for named people links */
+    a.person-link{
+      text-decoration: none; border-bottom: 1px dashed currentColor;
+    }
+    a.person-link:hover{ opacity: .9; }
+
+    /* 5) Projects: clean horizontal scroll on mobile (1 big card), 2 on tablet, 3 on desktop */
+    .proj-row{
+      display: grid; grid-auto-flow: column; gap: 14px;
+      grid-auto-columns: 88%;
+      overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch; padding: 6px 8px 12px;
+      mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent);
+      scrollbar-width: none;
+    }
+    .proj-row::-webkit-scrollbar{ display:none; }
+    .proj-row > .card{ scroll-snap-align: start; }
+    @media (min-width: 720px){ .proj-row{ grid-auto-columns: 48%; } }
+    @media (min-width: 980px){ .proj-row{ grid-auto-columns: min(32%, 420px); } }
+
+    /* 6) Make panels slightly translucent so bg photo shows yet text stays readable */
+    section, .side, .hero{
+      background: rgba(10,16,28,0.60);
+      -webkit-backdrop-filter: blur(6px) saturate(110%);
+              backdrop-filter: blur(6px) saturate(110%);
+    }
+    [data-theme="light"] section,
+    [data-theme="light"] .side,
+    [data-theme="light"] .hero{ background: rgba(255,255,255,0.55); }
+
+    /* 7) Background photo: ensure full bleed and slightly clearer on phones */
+    html, body { background: transparent !important; }
+    .bg-blur{
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: center / cover no-repeat url("./assets/bg.jpg?v=4");
+      transform: scale(1.02);
+      filter: blur(10px) saturate(112%);
+      opacity: 0.42;
+    }
+    .bg-blur::after{ content: none; }
+
 
   </style>
 </head>
@@ -463,7 +540,7 @@
 
       <section id="projects" aria-labelledby="projects-title">
         <h2 id="projects-title">Projects</h2>
-        <div class="grid hscroll">   <!-- add hscroll -->
+        <div class="proj-row">
           <article class="card">
             <h3>Reasoning Under 1 Billion</h3>
             <p>Guiding Reinforcement Fine-tuning with Intrinsic External Episodic Memory reward.</p>

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Name — Home</title>
+  <meta name="description" content="Personal site hosted on GitHub Pages: projects, publications, and contact." />
+  <meta property="og:title" content="Your Name — Home" />
+  <meta property="og:description" content="Projects, publications, and contact." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="" />
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root{
+      --bg: #0b1220;
+      --bg-elev: #0f172a;
+      --text: #e5e7eb;
+      --muted: #a1a1aa;
+      --brand: #60a5fa;
+      --card: #111827;
+      --border: #23324b;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg: #ffffff; --bg-elev:#f8fafc; --text:#0b1220; --muted:#475569; --brand:#2563eb; --card:#ffffff; --border:#e5e7eb;
+      }
+    }
+    html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+    a{color:var(--brand); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1100px; margin:0 auto; padding:0 1.2rem}
+    header{position:sticky; top:0; z-index:10; backdrop-filter:saturate(140%) blur(8px); background:color-mix(in oklab, var(--bg), transparent 35%); border-bottom:1px solid var(--border)}
+    .nav{display:flex; align-items:center; justify-content:space-between; height:64px}
+    .brand{display:flex; align-items:center; gap:.6rem; font-weight:700}
+    .brand .dot{width:10px; height:10px; border-radius:50%; background:var(--brand); box-shadow:0 0 15px color-mix(in oklab, var(--brand), white 20%)}
+    nav ul{display:flex; gap:1rem; list-style:none; padding:0; margin:0}
+    .menu-btn{display:none; background:none; border:1px solid var(--border); color:var(--text); border-radius:10px; padding:.45rem .7rem}
+    
+    .hero{padding:72px 0 36px; border-bottom:1px solid var(--border)}
+    .hero h1{font-size:clamp(28px, 5vw, 42px); line-height:1.2; margin:0 0 .5rem}
+    .hero p{max-width:60ch; color:var(--muted)}
+    .actions{display:flex; gap:.8rem; margin-top:1.2rem}
+    .btn{display:inline-flex; align-items:center; gap:.5rem; padding:.7rem 1rem; border-radius:14px; border:1px solid var(--border); background:var(--bg-elev); color:var(--text); box-shadow:var(--shadow)}
+    .btn.primary{background:var(--brand); color:white; border-color:transparent}
+    .btn:hover{transform:translateY(-1px)}
+
+    section{padding:48px 0}
+    .grid{display:grid; gap:1rem}
+    @media (min-width: 720px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1rem; box-shadow:var(--shadow)}
+    .card h3{margin:.2rem 0 .4rem}
+    .card p{color:var(--muted); margin:.2rem 0}
+    .tag{display:inline-block; font-size:.8rem; padding:.15rem .5rem; border:1px solid var(--border); border-radius:999px; color:var(--muted)}
+
+    .list{display:grid; gap:.8rem}
+    .list-item{display:flex; justify-content:space-between; gap:1rem; align-items:start; border-bottom:1px dashed var(--border); padding-bottom:.8rem}
+    .list-item:last-child{border-bottom:none}
+    .list-item time{white-space:nowrap; color:var(--muted)}
+
+    footer{padding:36px 0; border-top:1px solid var(--border); color:var(--muted)}
+    .social{display:flex; gap:.8rem}
+    .icon{width:18px; height:18px; display:inline-block}
+
+    /* Mobile nav */
+    @media (max-width: 720px){
+      nav ul{display:none}
+      nav ul.open{display:flex; position:absolute; top:64px; left:0; right:0; background:var(--bg); border-bottom:1px solid var(--border); padding:1rem; flex-direction:column}
+      .menu-btn{display:inline-flex}
+    }
+    /* Focus styles */
+    :where(a, button, summary):focus-visible{outline:2px solid var(--brand); outline-offset:3px; border-radius:8px}
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+  <header>
+    <div class="container nav">
+      <div class="brand"><span class="dot" aria-hidden="true"></span> <a href="#">Your Name</a></div>
+      <nav aria-label="Main">
+        <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">Menu</button>
+        <ul id="menu">
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#publications">Publications</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="hero" aria-labelledby="intro">
+      <h1 id="intro">Hi, I’m <strong>Your Name</strong> — I build ML systems and tools.</h1>
+      <p>
+        Short one-liner about you. Mention your role, interests, and what you’re open to (collabs, hiring, speaking).
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/yourname" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="cv.pdf" target="_blank" rel="noopener">Download CV</a>
+        <a class="btn" href="mailto:you@example.com">Email me</a>
+      </div>
+    </section>
+
+    <section id="projects" aria-labelledby="projects-title">
+      <h2 id="projects-title">Featured projects</h2>
+      <div class="grid" role="list">
+        <article class="card" role="listitem">
+          <h3>Project One</h3>
+          <p>A sentence about what it does and why it’s useful.</p>
+          <div class="tags"><span class="tag">Python</span> <span class="tag">LLM</span></div>
+          <p><a href="#">Repo →</a></p>
+        </article>
+        <article class="card" role="listitem">
+          <h3>Project Two</h3>
+          <p>Brief description. Add a link to a demo or paper.</p>
+          <div class="tags"><span class="tag">Timeseries</span> <span class="tag">RL</span></div>
+          <p><a href="#">Website →</a></p>
+        </article>
+        <article class="card" role="listitem">
+          <h3>Project Three</h3>
+          <p>Another brief description—keep it tight.</p>
+          <div class="tags"><span class="tag">MoE</span> <span class="tag">CUDA</span></div>
+          <p><a href="#">Docs →</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="publications" aria-labelledby="pubs-title">
+      <h2 id="pubs-title">Publications</h2>
+      <div class="list">
+        <div class="list-item">
+          <div>
+            <strong>Paper Title Goes Here</strong><br />
+            Your Name, Coauthor Name — <em>Conference 2025</em> — <a href="#">PDF</a>
+          </div>
+          <time datetime="2025-06">Jun 2025</time>
+        </div>
+        <div class="list-item">
+          <div>
+            <strong>Another Paper Title</strong><br />
+            Your Name, Someone — <em>Journal 2024</em> — <a href="#">PDF</a>
+          </div>
+          <time datetime="2024-09">Sep 2024</time>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" aria-labelledby="about-title">
+      <h2 id="about-title">About</h2>
+      <p>
+        A short bio. Where you’re based, what you study/work on, and a couple of highlights.
+      </p>
+    </section>
+
+    <section id="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title">Contact</h2>
+      <p>Best ways to reach you:</p>
+      <div class="social">
+        <a class="btn" href="mailto:you@example.com" aria-label="Email">Email</a>
+        <a class="btn" href="https://linkedin.com/in/yourname" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a>
+        <a class="btn" href="https://twitter.com/yourname" target="_blank" rel="noopener" aria-label="X/Twitter">X</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="y"></span> Your Name. Built with plain HTML/CSS on GitHub Pages.
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const btn = document.getElementById('menuBtn');
+    const menu = document.getElementById('menu');
+    btn?.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    // Dynamic year
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

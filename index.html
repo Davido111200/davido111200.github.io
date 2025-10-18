@@ -12,6 +12,36 @@
   <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2360a5fa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23g)'/%3E%3Ctext x='50' y='58' font-size='48' text-anchor='middle' font-family='system-ui,Segoe UI,Roboto' fill='%23011' %3ED%3C/text%3E%3C/svg%3E" />
   <style>
+    .bg-blur{
+      position: fixed;
+      inset: 0;
+      z-index: -1; /* behind everything */
+      background: center / cover no-repeat url("assets/bg.jpg"); /* put your image here */
+      filter: blur(18px) saturate(110%);
+      transform: scale(1.08);   /* avoid edge clipping after blur */
+      opacity: 0.22;            /* tweak 0.15–0.35 to taste */
+      will-change: transform;
+    }
+    .bg-blur::after{
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(0,0,0,0.35) 0%,
+        rgba(0,0,0,0.25) 40%,
+        rgba(0,0,0,0.35) 100%
+      );
+    }
+    /* keep content readable on top */
+    section, .side, .hero{ backdrop-filter: saturate(120%) blur(0.5px); }
+
+    /* optional tweaks */
+    @media (prefers-color-scheme: light){
+      .bg-blur::after{ background: rgba(255,255,255,0.22); }
+    }
+    @media (max-width: 640px){
+      .bg-blur{ filter: blur(12px) saturate(110%); opacity: .18; }
+    }    
     /* ===== Design tokens ===== */
     :root{
       --bg:#0b1220;           /* page background */
@@ -119,6 +149,7 @@
   </style>
 </head>
 <body>
+  <div class="bg-blur" aria-hidden="true"></div>
   <header class="hero" role="banner">
     <div class="hero-inner">
       <span class="dot" aria-hidden="true"></span>
@@ -172,6 +203,7 @@
         <ul>
           <li><a href="#about"><span class="pn" id="pn-about"></span> About</a></li>
           <li><a href="#projects"><span class="pn" id="pn-projects"></span> Projects</a></li>
+          <li><a href="#news"><span class="pn" id="pn-news"></span> News</a></li> <!-- added -->
           <li><a href="#publications"><span class="pn" id="pn-pubs"></span> Publications</a></li>
           <li><a href="#contact"><span class="pn" id="pn-contact"></span> Contact</a></li>
         </ul>
@@ -179,8 +211,8 @@
 
       <div class="tools" aria-label="Keywords">
         <span class="chip">RL</span>
-        <span class="chip">Episodic Memory</span>
-        <span class="chip">Steering</span>
+        <span class="chip">LLMs</span>
+        <span class="chip">Memory</span>
         <span class="chip">Time‑Series</span>
       </div>
     </aside>
@@ -189,8 +221,30 @@
       <section id="about" aria-labelledby="about-title">
         <h2 id="about-title">About</h2>
         <p class="lead">
-          I build efficient & safe LLMs—reinforcement learning, activation steering with episodic memory, and retrieval‑guided decoding—and apply time‑series forecasting to physics‑informed molecular dynamics. Current PhD candidate at Deakin University’s Applied AI Institute (A2I2).
+          My name is Van Dai Do. I build efficient & safe LLMs—reinforcement learning, activation steering with episodic memory, and retrieval‑guided decoding—and apply time‑series forecasting to physics‑informed molecular dynamics. Current PhD candidate and Research Assistant at Deakin University’s Applied AI Institute (A2I2).
         </p>
+      </section>
+
+      <section id="news" aria-labelledby="news-title">
+        <h2 id="news-title">News</h2>
+        <div class="list">
+          <!-- Duplicate the .item block below for each new entry -->
+          <div class="item">
+            <div>
+              <strong>Paper accepted to ACL 2025</strong><br>
+              <span class="muted">Dynamic Steering with Episodic Memory (DSEM)</span>
+            </div>
+            <time datetime="2025-07">Jul 2025</time>
+          </div>
+
+          <div class="item">
+            <div>
+              <strong>Selected projects updated</strong><br>
+              <span class="muted">Added ALEC and Prompting with Episodic Memory</span>
+            </div>
+            <time datetime="2025-06">Jun 2025</time>
+          </div>
+        </div>
       </section>
 
       <section id="projects" aria-labelledby="projects-title">
@@ -200,6 +254,7 @@
             <h3>DSEM — Dynamic Steering with Episodic Memory</h3>
             <p>Training‑free token‑level activation steering using episodic memory; adaptive alignment across safety & style.</p>
             <div class="tags"><span class="tag">LLM</span><span class="tag">Steering</span></div>
+            <p><span class="tag">ACL 2025</span></p>
             <p class="ext"><a href="https://github.com/Davido111200/DSEM" target="_blank" rel="noopener">Code →</a> · <a href="https://aclanthology.org/2025.findings-acl.706/" target="_blank" rel="noopener">Paper →</a></p>
           </article>
           <article class="card">
@@ -213,6 +268,7 @@
             <p>RL‑based prompt example selection from episodic memory to boost generalization across NLP tasks.</p>
             <div class="tags"><span class="tag">Prompting</span><span class="tag">RL</span></div>
             <p class="ext"><a href="https://github.com/Davido111200/Prompting_With_Episodic_Memory" target="_blank" rel="noopener">Code →</a></p>
+            <p><span class="tag">ECAI 2024 (Oral)</span></p>
           </article>
         </div>
       </section>
@@ -328,6 +384,7 @@
     const sections = [
       ['about','pn-about'],
       ['projects','pn-projects'],
+      ['news','pn-news'],        // added
       ['publications','pn-pubs'],
       ['contact','pn-contact'],
     ];

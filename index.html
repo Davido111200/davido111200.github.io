@@ -13,26 +13,25 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2360a5fa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23g)'/%3E%3Ctext x='50' y='58' font-size='48' text-anchor='middle' font-family='system-ui,Segoe UI,Roboto' fill='%23011' %3ED%3C/text%3E%3C/svg%3E" />
   <style>
     /* --- Background blur image --- */
-    /* keep content readable on top */
     section, .side, .hero{ backdrop-filter: saturate(120%) blur(0.5px); }
 
-    /* optional tweaks */
     @media (prefers-color-scheme: light){
       .bg-blur::after{ background: rgba(255,255,255,0.22); }
     }
     @media (max-width: 640px){
       .bg-blur{ filter: blur(12px) saturate(110%); opacity: .18; }
-    }    
+    }
+
     /* ===== Design tokens ===== */
     :root{
-      --bg:#0b1220;           /* page background */
-      --panel:#0f172a;        /* sidebar */
-      --card:#0b1326;         /* cards */
-      --text:#e5e7eb;         /* primary text */
-      --muted:#9aa3b2;        /* secondary text */
-      --border:#1f2a44;       /* soft border */
-      --brand:#6ee7b7;        /* mint */
-      --brand-2:#60a5fa;      /* blue */
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --card:#0b1326;
+      --text:#e5e7eb;
+      --muted:#9aa3b2;
+      --border:#1f2a44;
+      --brand:#6ee7b7;
+      --brand-2:#60a5fa;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius:16px;
       --maxw:1100px;
@@ -76,14 +75,49 @@
     /* Sidebar */
     .side{position:sticky; top:24px; align-self:start; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow)}
     .name{display:flex; align-items:center; gap:12px}
-    .avatar{width:56px; height:56px; border-radius:50%; object-fit:cover; border:1px solid var(--border); background:none; box-shadow:0 0 0 3px rgba(255,255,255,0.06)}
     .muted{color:var(--muted)}
     .title{margin:0}
 
+    /* CLEAN circular avatar + ring (single source of truth) */
+    .profile{
+      display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; margin-bottom:16px;
+    }
+    .avatar-ring{
+      padding:4px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow:0 8px 20px rgba(0,0,0,.35);
+      line-height:0; /* remove inline gaps */
+      display:inline-block;
+    }
+    .avatar{
+      width: clamp(96px, 28vw, 120px);
+      aspect-ratio: 1 / 1;
+      border-radius:50%;
+      object-fit:cover;
+      display:block;
+      border:2px solid color-mix(in oklab, var(--border), transparent 40%);
+      background:none;
+    }
+    @media (max-width:640px){
+      .avatar{ width:100px; }
+    }
+
     .cta{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 8px}
-    .btn{display:inline-flex; align-items:center; gap:.5rem; border:1px solid var(--border); padding:.5rem .8rem; border-radius:12px; background:var(--card); transition:transform .15s ease, background .2s ease}
-    .btn:hover{transform:translateY(-1px)}
-    .btn.primary{background:linear-gradient(90deg, var(--brand), var(--brand-2)); color:#001b14; border-color:transparent; font-weight:700}
+    .btn{
+      display:inline-flex; align-items:center; gap:.6rem;
+      border:1px solid var(--border);
+      padding:.62rem .9rem;
+      border-radius:14px;
+      background:var(--card);
+      transition:transform .15s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: color-mix(in oklab, var(--brand-2), transparent 50%); }
+    .btn svg{ width:20px; height:20px; flex-shrink:0; }
+    .btn.primary{
+      background:linear-gradient(90deg, var(--brand), var(--brand-2));
+      color:#001b14; border-color:transparent; font-weight:700;
+    }
 
     nav ul{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:8px}
     nav a{display:flex; align-items:center; gap:.5rem; padding:.45rem .6rem; border-radius:10px}
@@ -97,9 +131,7 @@
     section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow)}
     .lead{max-width:70ch}
 
-    /* Projects grid (generic grid helper, not used by the scroller) */
-    .grid{display:grid; gap:12px}
-    @media (min-width: 720px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    /* Card bits reused in multiple places */
     .card{border:1px solid var(--border); background:linear-gradient(180deg, color-mix(in oklab, var(--card), transparent 0%), color-mix(in oklab, var(--card), black 6%)); padding:16px; border-radius:14px; position:relative; overflow:hidden}
     .card::after{content:""; position:absolute; inset:auto -40% 0 -40%; height:2px; background:linear-gradient(90deg, var(--brand), var(--brand-2)); opacity:.4}
     .card:hover{outline:1px solid color-mix(in oklab, var(--brand-2), transparent 60%)}
@@ -128,183 +160,9 @@
     .pn{width:8px; height:8px; border-radius:50%; background:var(--muted); opacity:.6; transition:scale .2s ease}
     .pn.active{background:var(--brand-2); opacity:1; scale:1.2}
 
-    :root { --avatar: 120px; }
-    @media (max-width: 980px){ :root{ --avatar: 92px; } }
-    @media (max-width: 640px){ :root{ --avatar: 80px; } }
-
-    .avatar-ring{
-      padding: 3px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      box-shadow: 0 12px 30px rgba(0,0,0,.35);
-    }
-    .avatar{
-      width: var(--avatar);
-      height: var(--avatar);
-      display: block;
-      border-radius: 16px;
-      object-fit: cover;
-      background: none;
-      border: 1px solid color-mix(in oklab, var(--border), transparent 30%);
-      box-shadow: 0 6px 18px rgba(0,0,0,.25) inset;
-    }
-
-    .btn{
-      display:inline-flex; align-items:center; gap:.6rem;
-      border:1px solid var(--border);
-      padding:.62rem .9rem;
-      border-radius:14px;
-      background:var(--card);
-      transition:transform .15s ease, background .2s ease, border-color .2s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); border-color: color-mix(in oklab, var(--brand-2), transparent 50%); }
-    .btn svg{ width:20px; height:20px; flex-shrink:0; }
-    .btn.primary{
-      background:linear-gradient(90deg, var(--brand), var(--brand-2));
-      color:#001b14; border-color:transparent; font-weight:700;
-    }
-
-    .name{ display:flex; align-items:center; gap:14px; }
-
     html, body { background: transparent !important; }
 
-    /* 2) Use your existing .bg-blur as the photo layer (clearer, slightly blurred) */
-    .bg-blur{
-      position: fixed;
-      inset: 0;
-      z-index: 0;              /* sits behind content, above the transparent body */
-      pointer-events: none;
-      background: center / cover no-repeat url("./assets/bg.jpg?v=3"); /* cache-bust */
-      filter: blur(10px) saturate(112%);
-      transform: scale(1.03);  /* avoids edge gaps after blur */
-      opacity: 0.6;           /* adjust 0.35–0.55 to taste */
-      will-change: transform, filter, opacity;
-    }
-
-    /* Remove the dark/white gradient veil so the picture is really visible */
-    .bg-blur::after{ content:none; }
-
-    /* Ensure content layers above the background */
-    .hero, .wrap { position: relative; z-index: 1; }
-
-    /* 3) “Glass” panels so the photo shows through (no opaque white anywhere) */
-    :root{
-      --glass-dark: rgba(10,16,28,0.60);   /* dark glass */
-      --glass-light: rgba(255,255,255,0.55);/* light glass, still translucent */
-    }
-
-    section, .side, .hero{
-      background: var(--glass-dark);       /* default to dark glass */
-      backdrop-filter: blur(6px) saturate(110%);
-      -webkit-backdrop-filter: blur(6px) saturate(110%);
-      border-color: rgba(255,255,255,0.08);
-    }
-
-    /* If you ever switch to a light theme, keep panels translucent too */
-    [data-theme="light"] section,
-    [data-theme="light"] .side,
-    [data-theme="light"] .hero{
-      background: var(--glass-light);
-      border-color: rgba(0,0,0,0.08);
-    }
-    @media (max-width: 980px){
-      .side{
-        position: static !important;   /* was: sticky */
-        top: auto !important;
-        z-index: 1;                     /* keep above the bg layer */
-        transform: none;                /* avoid creating new stacking contexts */
-      }
-    }
-
-    /* Extra robustness for iOS Safari when sticky is enabled on desktop */
-    .side{
-      z-index: 2;                       /* sits above .bg-blur (z-index:0) */
-      -webkit-backdrop-filter: blur(6px) saturate(110%);
-      backdrop-filter: blur(6px) saturate(110%);
-      /* create its own layer to avoid flicker/tearing while scrolling */
-      will-change: transform;
-      contain: paint layout style;
-    }
-
-    /* ===== Projects: horizontal scroller (base styles) ===== */
-    .proj-row{
-      display: grid; grid-auto-flow: column; gap: 14px;
-      grid-auto-columns: 88%;
-      overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch; padding: 6px 8px 12px;
-      mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent);
-      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent);
-      /* NOTE: scrollbar hidden only on touch, see media rule below */
-    }
-    .proj-row > .card{ scroll-snap-align: start; }
-
-    @media (min-width: 720px){ .proj-row{ grid-auto-columns: 48%; } }
-    @media (min-width: 980px){ .proj-row{ grid-auto-columns: min(32%, 420px); } }
-
-    /* Hide scrollbar on touch devices only */
-    @media (hover:none){
-      .proj-row::-webkit-scrollbar{ display:none; }
-      .proj-row{ scrollbar-width: none; }
-    }
-
-    /* ====== Projects: laptop-friendly navigation (arrows, focus, desktop scrollbar) ====== */
-    .scroller-wrap{ position: relative; }
-
-    .proj-row:focus{
-      outline: 2px solid var(--brand-2);
-      outline-offset: 2px;
-    }
-
-    /* Show a thin scrollbar on devices with a mouse/trackpad */
-    @media (hover:hover){
-      .proj-row{ scrollbar-width: thin; }
-      .proj-row::-webkit-scrollbar{ height: 8px; }
-      .proj-row::-webkit-scrollbar-thumb{
-        background: color-mix(in oklab, var(--brand-2), transparent 60%);
-        border-radius: 8px;
-      }
-    }
-
-    /* Make each card snap cleanly and not skip */
-    .proj-row > .card{
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-    }
-
-    /* Arrow controls (only show on non-touch) */
-    .proj-nav{
-      position: absolute; inset: 0;
-      display: none;
-      pointer-events: none;
-    }
-    @media (hover:hover){
-      .proj-nav{ display: block; }
-    }
-    .proj-btn{
-      position: absolute; top: 50%; translate: 0 -50%;
-      pointer-events: auto;
-      display: grid; place-items: center;
-      width: 36px; height: 36px; border-radius: 999px;
-      border: 1px solid var(--border); background: var(--card);
-      box-shadow: var(--shadow); cursor: pointer;
-    }
-    .proj-btn:hover{ transform: translateY(-1px); }
-    .proj-btn.left{ left: -10px; }
-    .proj-btn.right{ right: -10px; }
-    .proj-btn svg{ width: 18px; height: 18px; }
-
-    /* 6) Make panels slightly translucent so bg photo shows yet text stays readable */
-    section, .side, .hero{
-      background: rgba(10,16,28,0.60);
-      -webkit-backdrop-filter: blur(6px) saturate(110%);
-              backdrop-filter: blur(6px) saturate(110%);
-    }
-    [data-theme="light"] section,
-    [data-theme="light"] .side,
-    [data-theme="light"] .hero{ background: rgba(255,255,255,0.55); }
-
-    /* 7) Background photo: ensure full bleed and slightly clearer on phones */
-    html, body { background: transparent !important; }
+    /* Background photo */
     .bg-blur{
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: center / cover no-repeat url("./assets/bg.jpg?v=4");
@@ -313,6 +171,80 @@
       opacity: 0.42;
     }
     .bg-blur::after{ content: none; }
+
+    /* Panels translucent (dark/light) */
+    :root{ --glass-dark: rgba(10,16,28,0.60); --glass-light: rgba(255,255,255,0.55); }
+    section, .side, .hero{
+      background: var(--glass-dark);
+      -webkit-backdrop-filter: blur(6px) saturate(110%);
+              backdrop-filter: blur(6px) saturate(110%);
+      border-color: rgba(255,255,255,0.08);
+    }
+    [data-theme="light"] section,
+    [data-theme="light"] .side,
+    [data-theme="light"] .hero{ background: var(--glass-light); border-color: rgba(0,0,0,0.08); }
+
+    @media (max-width: 980px){
+      .side{
+        position: static !important; top:auto !important; z-index:1; transform:none;
+        padding: 18px;
+      }
+    }
+
+    .side{
+      z-index: 2;
+      -webkit-backdrop-filter: blur(6px) saturate(110%);
+      backdrop-filter: blur(6px) saturate(110%);
+      will-change: transform;
+      contain: paint layout style;
+    }
+
+    /* ===== Projects: horizontal scroller ===== */
+    .proj-row{
+      display: grid; grid-auto-flow: column; gap: 14px;
+      grid-auto-columns: 88%;
+      overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch; padding: 6px 8px 12px;
+      mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent);
+    }
+    .proj-row > .card{ scroll-snap-align: start; }
+
+    @media (min-width: 720px){ .proj-row{ grid-auto-columns: 48%; } }
+    @media (min-width: 980px){ .proj-row{ grid-auto-columns: min(32%, 420px); } }
+
+    /* Hide scrollbar on touch only */
+    @media (hover:none){
+      .proj-row::-webkit-scrollbar{ display:none; }
+      .proj-row{ scrollbar-width: none; }
+    }
+
+    /* Laptop-friendly discoverability */
+    .scroller-wrap{ position: relative; }
+    .proj-row:focus{ outline: 2px solid var(--brand-2); outline-offset: 2px; }
+    @media (hover:hover){
+      .proj-row{ scrollbar-width: thin; }
+      .proj-row::-webkit-scrollbar{ height: 8px; }
+      .proj-row::-webkit-scrollbar-thumb{
+        background: color-mix(in oklab, var(--brand-2), transparent 60%);
+        border-radius: 8px;
+      }
+    }
+    .proj-row > .card{ scroll-snap-stop: always; }
+
+    .proj-nav{ position: absolute; inset: 0; display:none; pointer-events:none; }
+    @media (hover:hover){ .proj-nav{ display:block; } }
+    .proj-btn{
+      position:absolute; top:50%; translate:0 -50%;
+      pointer-events:auto; display:grid; place-items:center;
+      width:36px; height:36px; border-radius:999px;
+      border:1px solid var(--border); background:var(--card);
+      box-shadow:var(--shadow); cursor:pointer;
+    }
+    .proj-btn:hover{ transform: translateY(-1px); }
+    .proj-btn.left{ left:-10px; }
+    .proj-btn.right{ right:-10px; }
+    .proj-btn svg{ width:18px; height:18px; }
   </style>
 </head>
 <body>
@@ -392,61 +324,37 @@
         <h2 id="news-title">News</h2>
         <div class="list">
           <div class="item">
-            <div>
-              <strong>🎉1 paper accepted to TMLR</strong><br>
-            </div>
+            <div><strong>🎉1 paper accepted to TMLR</strong><br></div>
             <time datetime="2025-10">Oct 2025</time>
           </div>
-
           <div class="item">
-            <div>
-              <strong>🎉1 paper accepted to ICDM 2025</strong><br>
-            </div>
+            <div><strong>🎉1 paper accepted to ICDM 2025</strong><br></div>
             <time datetime="2025-09">Sep 2025</time>
           </div>
-
           <div class="item">
-            <div>
-              <strong>🎉1 paper accepted to EMNLP 2025</strong><br>
-            </div>
+            <div><strong>🎉1 paper accepted to EMNLP 2025</strong><br></div>
             <time datetime="2025-08">Aug 2025</time>
           </div>
-
           <div class="item">
-            <div>
-              <strong>🎉1 paper accepted to ACL 2025</strong><br>
-            </div>
+            <div><strong>🎉1 paper accepted to ACL 2025</strong><br></div>
             <time datetime="2025-05">May 2025</time>
           </div>
-
           <div class="item">
-            <div>
-              <strong>📖I started working as a Research Assistant under Dr. Hung Le's supervision on the Australian Research Council (ARC) DECRA grant to implement innovative time series forecasting models.</strong><br>
-            </div>
+            <div><strong>📖I started working as a Research Assistant under Dr. Hung Le's supervision on the Australian Research Council (ARC) DECRA grant to implement innovative time series forecasting models.</strong><br></div>
             <time datetime="2025-02">Feb 2025</time>
           </div>
-
           <div class="item">
-            <div>
-              <strong>🎉1 paper accepted to ECAI 2024</strong><br>
-            </div>
+            <div><strong>🎉1 paper accepted to ECAI 2024</strong><br></div>
             <time datetime="2024-7">Jul 2024</time>
           </div>
-
           <div class="item">
-            <div>
-              <strong>📖Invited tutorial at AAMAS</strong><br>
-            </div>
+            <div><strong>📖Invited tutorial at AAMAS</strong><br></div>
             <time datetime="2023-10">Oct 2023</time>
           </div>
-
           <div class="item">
-            <div>
-              <strong>🛫I am starting my PhD journey at Applied Artificial Intelligence Initiative (A2I2), Deakin University, Australia with a full-ride HDR scholarship!</strong><br>
-            </div>
+            <div><strong>🛫I am starting my PhD journey at Applied Artificial Intelligence Initiative (A2I2), Deakin University, Australia with a full-ride HDR scholarship!</strong><br></div>
             <time datetime="2023-08">Aug 2023</time>
           </div>
-
         </div>
       </section>
 
@@ -642,7 +550,6 @@
         document.documentElement.style.setProperty('--brand','#6ee7b7');
         document.documentElement.style.setProperty('--brand-2','#60a5fa');
       } else {
-        // auto: let prefers-color-scheme handle via CSS @media rules
         document.documentElement.style.removeProperty('--bg');
         document.documentElement.style.removeProperty('--panel');
         document.documentElement.style.removeProperty('--card');
@@ -664,7 +571,7 @@
       const btnNext  = document.getElementById('projNext');
       if(!scroller) return;
 
-      // Convert vertical wheel to horizontal (desktop mice)
+      // Convert vertical wheel to horizontal
       scroller.addEventListener('wheel', (e) => {
         if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
           scroller.scrollBy({ left: e.deltaY, behavior: 'auto' });
@@ -672,7 +579,7 @@
         }
       }, { passive: false });
 
-      // Click-and-drag to scroll
+      // Click-and-drag
       let isDown = false, startX = 0, startLeft = 0;
       scroller.addEventListener('pointerdown', (e) => {
         isDown = true;
@@ -694,14 +601,14 @@
       // Arrow buttons move by one card
       const stepByCard = (dir) => {
         const card = scroller.querySelector('.card');
-        const gap = 14; // matches CSS
+        const gap = 14;
         const step = card ? (card.getBoundingClientRect().width + gap) : scroller.clientWidth * 0.9;
         scroller.scrollBy({ left: dir * step, behavior: 'smooth' });
       };
       btnPrev?.addEventListener('click', () => stepByCard(-1));
       btnNext?.addEventListener('click', () => stepByCard(1));
 
-      // Keyboard arrows when scroller is focused
+      // Keyboard arrows when focused
       scroller.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight') { stepByCard(1); e.preventDefault(); }
         if (e.key === 'ArrowLeft')  { stepByCard(-1); e.preventDefault(); }

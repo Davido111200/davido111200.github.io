@@ -6,10 +6,13 @@
   <title>Van Dai Do — PhD @ Deakin A2I2</title>
   <meta name="description" content="Van Dai Do — PhD @ Deakin A2I2. Efficient & safe LLMs (RL, steering, episodic memory), time-series forecasting, and physics-informed MD." />
   <meta property="og:title" content="Van Dai Do — PhD @ Deakin A2I2" />
+  <meta property="og:description" content="Efficient & safe LLMs (RL, steering, episodic memory), time-series forecasting, and physics-informed MD." />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#0ea5e9" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2360a5fa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23g)'/%3E%3Ctext x='50' y='58' font-size='48' text-anchor='middle' font-family='system-ui,Segoe UI,Roboto' fill='%23011' %3ED%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="./assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="./assets/icons/favicon-16.png" sizes="16x16" type="image/png">
   <style>
     /* --- Background blur image --- */
     section, .side, .hero{ backdrop-filter: saturate(120%) blur(0.5px); }
@@ -34,6 +37,7 @@
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius:16px;
       --maxw:1100px;
+      --topbar-h: 56px; /* used for anchor offset */
     }
     @media (prefers-color-scheme: light){
       :root{ --bg:#ffffff; --panel:#f8fafc; --card:#ffffff; --text:#0b1220; --muted:#475569; --border:#e5e7eb; --brand:#0ea5e9; --brand-2:#16a34a; }
@@ -67,17 +71,69 @@
     .hero-inner{max-width:var(--maxw); margin:0 auto; padding:28px 24px; display:flex; align-items:center; gap:16px}
     .dot{width:10px; height:10px; border-radius:50%; background:var(--brand-2); box-shadow:0 0 0 6px color-mix(in oklab, var(--brand-2), transparent 80%)}
 
+    /* ===== Top bar (in-page navigation) ===== */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 5; /* above .side (z:2) and .hero (z:1) */
+      backdrop-filter: blur(8px) saturate(110%);
+      -webkit-backdrop-filter: blur(8px) saturate(110%);
+      background: rgba(10,16,28,0.60);
+      border-bottom: 1px solid var(--border);
+    }
+    [data-theme="light"] .topbar{
+      background: rgba(255,255,255,0.60);
+    }
+    .topbar-inner{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbrand{
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      opacity: .9;
+    }
+    .topnav{
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .toplink{
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .35rem .7rem;
+      border-radius: 999px;
+      text-decoration: none;
+      color: var(--text);
+      border: 1px solid transparent;
+    }
+    .toplink:hover{ background: rgba(255,255,255,.06); }
+    .toplink:focus-visible{ outline: 2px solid var(--brand-2); outline-offset: 2px; border-radius: 999px; }
+    .toplink.active{
+      background: color-mix(in oklab, var(--brand-2), transparent 82%);
+      border-color: color-mix(in oklab, var(--brand-2), transparent 60%);
+    }
+    /* Make anchored sections stop *below* the sticky bar */
+    section{ scroll-margin-top: calc(var(--topbar-h) + 12px); }
+
     /* ===== Layout ===== */
     .wrap{display:grid; grid-template-columns:320px 1fr; gap:24px; max-width:calc(var(--maxw) + 320px); margin:0 auto; padding:24px}
     @media (max-width: 980px){ .wrap{grid-template-columns:1fr; max-width:var(--maxw)} }
 
-    /* Sidebar */
+    /* Sidebar & profile */
     .side{position:sticky; top:24px; align-self:start; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow)}
     .name{display:flex; align-items:center; gap:12px}
     .muted{color:var(--muted)}
     .title{margin:0}
 
-    /* CLEAN circular avatar + ring (single source of truth) */
     .profile{
       display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; margin-bottom:16px;
     }
@@ -86,7 +142,7 @@
       border-radius:50%;
       background:linear-gradient(135deg, var(--brand), var(--brand-2));
       box-shadow:0 8px 20px rgba(0,0,0,.35);
-      line-height:0; /* remove inline gaps */
+      line-height:0;
       display:inline-block;
     }
     .avatar{
@@ -130,7 +186,7 @@
     section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow)}
     .lead{max-width:70ch}
 
-    /* Card bits reused in multiple places */
+    /* Card bits */
     .card{border:1px solid var(--border); background:linear-gradient(180deg, color-mix(in oklab, var(--card), transparent 0%), color-mix(in oklab, var(--card), black 6%)); padding:16px; border-radius:14px; position:relative; overflow:hidden}
     .card::after{content:""; position:absolute; inset:auto -40% 0 -40%; height:2px; background:linear-gradient(90deg, var(--brand), var(--brand-2)); opacity:.4}
     .card:hover{outline:1px solid color-mix(in oklab, var(--brand-2), transparent 60%)}
@@ -151,7 +207,7 @@
     /* Focus */
     :where(a,button):focus-visible{outline:2px solid var(--brand-2); outline-offset:3px; border-radius:8px}
 
-    /* Theme toggle */
+    /* Theme toggle pill */
     .toggle{display:inline-flex; gap:6px; align-items:center; border:1px dashed var(--border); border-radius:999px; padding:.25rem .5rem; cursor:pointer; user-select:none}
     .toggle svg{width:18px; height:18px}
 
@@ -171,7 +227,7 @@
     }
     .bg-blur::after{ content: none; }
 
-    /* Panels translucent (dark/light) */
+    /* Panels translucent */
     :root{ --glass-dark: rgba(10,16,28,0.60); --glass-light: rgba(255,255,255,0.55); }
     section, .side, .hero{
       background: var(--glass-dark);
@@ -244,73 +300,12 @@
     .proj-btn.left{ left:-10px; }
     .proj-btn.right{ right:-10px; }
     .proj-btn svg{ width:18px; height:18px; }
-    /* ===== Top bar (in-page navigation) ===== */
-    :root { --topbar-h: 56px; } /* used for anchor offset */
-
-    .topbar{
-      position: sticky;
-      top: 0;
-      z-index: 5; /* above .side (z:2) and .hero (z:1) */
-      backdrop-filter: blur(8px) saturate(110%);
-      -webkit-backdrop-filter: blur(8px) saturate(110%);
-      background: rgba(10,16,28,0.60);
-      border-bottom: 1px solid var(--border);
-    }
-    [data-theme="light"] .topbar{
-      background: rgba(255,255,255,0.60);
-    }
-
-    .topbar-inner{
-      max-width: var(--maxw);
-      margin: 0 auto;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .topbrand{
-      font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
-      opacity: .9;
-    }
-
-    .topnav{
-      margin-left: auto;
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .toplink{
-      display: inline-flex;
-      align-items: center;
-      gap: .35rem;
-      padding: .35rem .7rem;
-      border-radius: 999px;
-      text-decoration: none;
-      color: var(--text);
-      border: 1px solid transparent;
-    }
-    .toplink:hover{ background: rgba(255,255,255,.06); }
-    .toplink:focus-visible{ outline: 2px solid var(--brand-2); outline-offset: 2px; border-radius: 999px; }
-
-    /* active pill */
-    .toplink.active{
-      background: color-mix(in oklab, var(--brand-2), transparent 82%);
-      border-color: color-mix(in oklab, var(--brand-2), transparent 60%);
-    }
-
-    /* Make anchored sections stop *below* the sticky bar */
-    section{ scroll-margin-top: calc(var(--topbar-h) + 12px); }
-
-
   </style>
 </head>
 <body>
   <div class="bg-blur" aria-hidden="true"></div>
-  <!-- Top in-page nav bar -->
+
+  <!-- Top in-page nav bar (theme toggle moved here) -->
   <div class="topbar" role="navigation" aria-label="In-page navigation">
     <div class="topbar-inner">
       <a class="topbrand" href="#about">Van Dai Do</a>
@@ -321,6 +316,10 @@
         <a class="toplink" href="#publications" data-section="publications">Publications</a>
         <a class="toplink" href="#contact"      data-section="contact">Contact</a>
       </nav>
+      <button id="themeBtn" class="toggle" aria-label="Toggle theme">
+        <svg id="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4 12H2m20 0h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M5 19l1.5-1.5"/></svg>
+        <span class="muted" id="themeLabel">Auto</span>
+      </button>
     </div>
   </div>
 
@@ -331,12 +330,7 @@
         <strong>Van Dai Do</strong>
         <div class="muted">Efficient & safe LLMs · episodic memory · time-series for MD</div>
       </div>
-      <div style="margin-left:auto">
-        <button id="themeBtn" class="toggle" aria-label="Toggle theme">
-          <svg id="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4 12H2m20 0h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M5 19l1.5-1.5"/></svg>
-          <span class="muted" id="themeLabel">Auto</span>
-        </button>
-      </div>
+      <!-- Theme toggle REMOVED from here -->
     </div>
   </header>
 
@@ -585,7 +579,7 @@
       }
     });
 
-    // Progress nav dots highlight based on scroll position
+    // Progress nav dots highlight based on scroll position (sidebar)
     const sections = [
       ['about','pn-about'],
       ['news','pn-news'],
@@ -603,15 +597,12 @@
     }, opts);
     sections.forEach(([sid])=>{ const el = document.getElementById(sid); if(el) io.observe(el); });
 
-    // === Keep the new topbar links in sync with the visible section
+    // Keep the new topbar links in sync with the visible section
     const topLinks = Array.from(document.querySelectorAll('.toplink'));
     const setTopActive = (id) => {
       topLinks.forEach(a => a.classList.toggle('active', a.dataset.section === id));
     };
-
-    // Reuse the same observer: when a section is intersecting, set it active
     const io2 = new IntersectionObserver((entries)=>{
-      // pick the entry most visible to avoid flicker when two overlap
       let best = null;
       for(const e of entries){
         if(!e.isIntersecting) continue;
@@ -619,13 +610,10 @@
       }
       if(best){ setTopActive(best.target.id); }
     }, { root: null, rootMargin: '0px 0px -60% 0px', threshold: [0.25, 0.6, 0.9] });
-
     sections.forEach(([sid])=>{
       const el = document.getElementById(sid);
       if(el) io2.observe(el);
     });
-
-    // Optional: smooth scroll on click (anchors already smooth via CSS in most browsers)
     topLinks.forEach(a=>{
       a.addEventListener('click', (e)=>{
         const id = a.getAttribute('href').slice(1);
@@ -637,43 +625,6 @@
         }
       });
     });
-
-
-    // Respect theme (auto) by syncing CSS variables when dataset is set
-    const applyThemeVars = () => {
-      const t = document.documentElement.dataset.theme;
-      if(t === 'light'){
-        document.documentElement.style.setProperty('--bg','#ffffff');
-        document.documentElement.style.setProperty('--panel','#f8fafc');
-        document.documentElement.style.setProperty('--card','#ffffff');
-        document.documentElement.style.setProperty('--text','#0b1220');
-        document.documentElement.style.setProperty('--muted','#475569');
-        document.documentElement.style.setProperty('--border','#e5e7eb');
-        document.documentElement.style.setProperty('--brand','#0ea5e9');
-        document.documentElement.style.setProperty('--brand-2','#16a34a');
-      } else if(t === 'dark'){
-        document.documentElement.style.setProperty('--bg','#0b1220');
-        document.documentElement.style.setProperty('--panel','#0f172a');
-        document.documentElement.style.setProperty('--card','#0b1326');
-        document.documentElement.style.setProperty('--text','#e5e7eb');
-        document.documentElement.style.setProperty('--muted','#9aa3b2');
-        document.documentElement.style.setProperty('--border','#1f2a44');
-        document.documentElement.style.setProperty('--brand','#6ee7b7');
-        document.documentElement.style.setProperty('--brand-2','#60a5fa');
-      } else {
-        document.documentElement.style.removeProperty('--bg');
-        document.documentElement.style.removeProperty('--panel');
-        document.documentElement.style.removeProperty('--card');
-        document.documentElement.style.removeProperty('--text');
-        document.documentElement.style.removeProperty('--muted');
-        document.documentElement.style.removeProperty('--border');
-        document.documentElement.style.removeProperty('--brand');
-        document.documentElement.style.removeProperty('--brand-2');
-      }
-    };
-    const mo = new MutationObserver(applyThemeVars);
-    mo.observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
-    applyThemeVars();
 
     /* ===== Projects scroller: mouse wheel → horizontal, drag, arrows, keyboard ===== */
     (function(){
@@ -716,7 +667,6 @@
         const step = card ? (card.getBoundingClientRect().width + gap) : scroller.clientWidth * 0.9;
         scroller.scrollBy({ left: dir * step, behavior: 'smooth' });
       };
-
       btnPrev?.addEventListener('click', () => stepByCard(-1));
       btnNext?.addEventListener('click', () => stepByCard(1));
 
@@ -726,7 +676,6 @@
         if (e.key === 'ArrowLeft')  { stepByCard(-1); e.preventDefault(); }
       });
     })();
-
   </script>
 
   <!-- Structured data -->

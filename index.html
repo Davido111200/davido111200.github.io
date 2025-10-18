@@ -603,6 +603,42 @@
     }, opts);
     sections.forEach(([sid])=>{ const el = document.getElementById(sid); if(el) io.observe(el); });
 
+    // === Keep the new topbar links in sync with the visible section
+    const topLinks = Array.from(document.querySelectorAll('.toplink'));
+    const setTopActive = (id) => {
+      topLinks.forEach(a => a.classList.toggle('active', a.dataset.section === id));
+    };
+
+    // Reuse the same observer: when a section is intersecting, set it active
+    const io2 = new IntersectionObserver((entries)=>{
+      // pick the entry most visible to avoid flicker when two overlap
+      let best = null;
+      for(const e of entries){
+        if(!e.isIntersecting) continue;
+        if(!best || e.intersectionRatio > best.intersectionRatio) best = e;
+      }
+      if(best){ setTopActive(best.target.id); }
+    }, { root: null, rootMargin: '0px 0px -60% 0px', threshold: [0.25, 0.6, 0.9] });
+
+    sections.forEach(([sid])=>{
+      const el = document.getElementById(sid);
+      if(el) io2.observe(el);
+    });
+
+    // Optional: smooth scroll on click (anchors already smooth via CSS in most browsers)
+    topLinks.forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        const id = a.getAttribute('href').slice(1);
+        const target = document.getElementById(id);
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({ behavior:'smooth', block:'start' });
+          setTopActive(id);
+        }
+      });
+    });
+
+
     // Respect theme (auto) by syncing CSS variables when dataset is set
     const applyThemeVars = () => {
       const t = document.documentElement.dataset.theme;
@@ -680,22 +716,6 @@
         const step = card ? (card.getBoundingClientRect().width + gap) : scroller.clientWidth * 0.9;
         scroller.scrollBy({ left: dir * step, behavior: 'smooth' });
       };
-      const sections = [
-        ['about','pn-about'],
-        ['news','pn-news'],
-        ['projects','pn-projects'],
-        ['publications','pn-pubs'],
-        ['contact','pn-contact'],
-      ];
-      const opts = {root:null, rootMargin:'0px 0px -60% 0px', threshold:0.1};
-      const io = new IntersectionObserver((entries)=>{
-        entries.forEach(entry => {
-          const id = entry.target.id;
-          const dot = document.getElementById('pn-' + id);
-          if(dot){ dot.classList.toggle('active', entry.isIntersecting); }
-        });
-      }, opts);
-      sections.forEach(([sid])=>{ const el = document.getElementById(sid); if(el) io.observe(el); });
 
       btnPrev?.addEventListener('click', () => stepByCard(-1));
       btnNext?.addEventListener('click', () => stepByCard(1));

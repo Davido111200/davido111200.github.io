@@ -58,10 +58,17 @@
     h3{font-size:clamp(18px, 2vw, 20px)}
 
 
-    .links .link svg{
-      width: var(--icon-size);
-      height: var(--icon-size);
-      opacity: .9;
+    /* Sidebar quick links: one per row */
+    .links{
+      display: flex;            /* stack children vertically */
+      flex-direction: column;
+      gap: 8px;                 /* space between rows */
+      flex-wrap: nowrap;        /* don't wrap onto the same line */
+    }
+    .links .link{
+      display: flex;            /* icon + label on the same row */
+      align-items: center;
+      width: 100%;              /* take full sidebar width */
     }
 
     /* ===== Top ribbon / hero ===== */

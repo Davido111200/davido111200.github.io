@@ -13,31 +13,6 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2360a5fa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23g)'/%3E%3Ctext x='50' y='58' font-size='48' text-anchor='middle' font-family='system-ui,Segoe UI,Roboto' fill='%23011' %3ED%3C/text%3E%3C/svg%3E" />
   <style>
     /* --- Background blur image --- */
-    .bg-blur{
-      position: fixed;
-      inset: 0;
-      z-index: 0;                  /* was -1: keep it above body background */
-      pointer-events: none;        /* don't block clicks */
-      background: center / cover no-repeat url("assets/bg.jpg");
-      filter: blur(18px) saturate(110%);
-      transform: scale(1.08);
-      opacity: 0.22;
-      will-change: transform;
-    }
-    .bg-blur::after{
-      content: "";
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(0,0,0,0.35) 0%,
-        rgba(0,0,0,0.25) 40%,
-        rgba(0,0,0,0.35) 100%
-      );
-    }
-
-    /* ensure content layers above the bg */
-    .hero, .wrap { position: relative; z-index: 1; }
-
     /* keep content readable on top */
     section, .side, .hero{ backdrop-filter: saturate(120%) blur(0.5px); }
 
@@ -190,6 +165,55 @@
     }
 
     .name{ display:flex; align-items:center; gap:14px; }
+
+    html, body { background: transparent !important; }
+
+    /* 2) Use your existing .bg-blur as the photo layer (clearer, slightly blurred) */
+    .bg-blur{
+      position: fixed;
+      inset: 0;
+      z-index: 0;              /* sits behind content, above the transparent body */
+      pointer-events: none;
+      background: center / cover no-repeat url("./assets/bg.jpg?v=3"); /* cache-bust */
+      filter: blur(10px) saturate(112%);
+      transform: scale(1.03);  /* avoids edge gaps after blur */
+      opacity: 0.42;           /* adjust 0.35–0.55 to taste */
+      will-change: transform, filter, opacity;
+    }
+
+    /* Remove the dark/white gradient veil so the picture is really visible */
+    .bg-blur::after{ content:none; }
+
+    /* Ensure content layers above the background */
+    .hero, .wrap { position: relative; z-index: 1; }
+
+    /* 3) “Glass” panels so the photo shows through (no opaque white anywhere) */
+    :root{
+      --glass-dark: rgba(10,16,28,0.60);   /* dark glass */
+      --glass-light: rgba(255,255,255,0.55);/* light glass, still translucent */
+    }
+
+    section, .side, .hero{
+      background: var(--glass-dark);       /* default to dark glass */
+      backdrop-filter: blur(6px) saturate(110%);
+      -webkit-backdrop-filter: blur(6px) saturate(110%);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    /* If you ever switch to a light theme, keep panels translucent too */
+    [data-theme="light"] section,
+    [data-theme="light"] .side,
+    [data-theme="light"] .hero{
+      background: var(--glass-light);
+      border-color: rgba(0,0,0,0.08);
+    }
+
+    /* 4) Remove any earlier per-theme hard backgrounds so nothing turns solid white */
+    @media (prefers-color-scheme: light){
+      :root{
+        /* keep your color tokens, but we won't use --bg/--panel as solid fills */
+      }
+    }
 
   </style>
 </head>

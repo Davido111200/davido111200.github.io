@@ -258,6 +258,28 @@
       .grid.hscroll > .card{ flex-basis: clamp(280px, 30vw, 380px); } /* tighter 3 */
     }
 
+    /* --- Name stays on one line, no wrapping --- */
+    .name{ display:flex; align-items:center; gap:14px; min-width:0; }      /* allow text to shrink properly */
+    .name > div:last-child{ min-width:0; }                                 /* prevent flex overflow */
+    .title{
+      white-space: nowrap;                                                 /* one line only */
+      overflow: hidden; text-overflow: ellipsis;                           /* if space is super tight */
+      font-size: clamp(18px, 3.6vw, 28px);                                 /* auto-shrink on small screens */
+      line-height: 1.15;
+    }
+
+    /* Also keep the hero name in one line */
+    .hero .hero-inner strong{
+      white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* On phones, avoid duplicating the big name line: show hero name, hide sidebar title */
+    @media (max-width: 640px){
+      .side .title{ display:none; }
+    }
+
+
   </style>
 </head>
 <body>
@@ -365,6 +387,13 @@
               <strong>🎉1 paper accepted to ACL 2025</strong><br>
             </div>
             <time datetime="2025-05">May 2025</time>
+          </div>
+
+          <div class="item">
+            <div>
+              <strong>📖I started working as a Research Assistant under Dr. Hung Le's supervision on the Australian Research Council (ARC) DECRA grant to implement innovative time series forecasting models.</strong><br>
+            </div>
+            <time datetime="2025-02">Feb 2025</time>
           </div>
 
           <div class="item">

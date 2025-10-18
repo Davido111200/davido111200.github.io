@@ -316,6 +316,26 @@
     .proj-btn.left{ left:-10px; }
     .proj-btn.right{ right:-10px; }
     .proj-btn svg{ width:18px; height:18px; }
+
+    /* Sidebar quick links: vertical list, icon on the left */
+    .links{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top:16px; padding-top:12px; border-top:1px dashed var(--border);
+    }
+    .link{
+      display:flex; align-items:center; gap:10px;
+      padding:.35rem .5rem; border-radius:10px; color:var(--text); text-decoration:none;
+    }
+    .link:hover{ background: rgba(255,255,255,.06); }
+    [data-theme="light"] .link:hover{ background: rgba(0,0,0,.06); }
+
+    /* the icon box (keeps all icons aligned left) */
+    .link .ico{
+      width: 16px; height: 16px; display:inline-grid; place-items:center; flex: 0 0 16px;
+    }
+    .link .ico svg{ width:16px; height:16px; display:block; }
   </style>
 </head>
 <body>
@@ -369,79 +389,66 @@
 
       <!-- Quick links -->
       <div class="links" aria-label="Quick links">
-        <!-- Location (not a link) -->
+        <!-- Location (static text row) -->
         <div class="link" role="text">
-          <!-- pin -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s7-5.4 7-12a7 7 0 10-14 0c0 6.6 7 12 7 12z"/><circle cx="12" cy="10" r="3"/>
-          </svg>
+          <span class="ico" aria-hidden="true">
+            <!-- pin -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s7-5.4 7-12a7 7 0 10-14 0c0 6.6 7 12 7 12z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+          </span>
           <span>Australia</span>
         </div>
 
         <a class="link" href="https://vandaido.github.io/" target="_blank" rel="noopener">
-          <!-- link icon -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10 13a5 5 0 007.07 0l1.17-1.17a5 5 0 10-7.07-7.07L10 4"/>
-            <path d="M14 11a5 5 0 01-7.07 0L5.76 9.83a5 5 0 117.07-7.07L14 4"/>
-          </svg>
+          <span class="ico" aria-hidden="true">
+            <!-- link -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 007.07 0l1.17-1.17a5 5 0 10-7.07-7.07L10 4"/>
+              <path d="M14 11a5 5 0 01-7.07 0L5.76 9.83a5 5 0 117.07-7.07L14 4"/>
+            </svg>
+          </span>
           <span>Website</span>
         </a>
 
         <a class="link" href="mailto:v.do@deakin.edu.au">
-          <!-- mail -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>
-          </svg>
+          <span class="ico" aria-hidden="true">
+            <!-- mail -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>
+            </svg>
+          </span>
           <span>Email</span>
         </a>
 
-        <a class="link" href="https://www.researchgate.net/" target="_blank" rel="noopener">
-          <!-- beaker-ish (generic for ResearchGate) -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 3h12"/><path d="M8 3v5l-4 7a4 4 0 003.6 6h8.8A4 4 0 0020 15l-4-7V3"/>
-            <path d="M8 8h8"/>
-          </svg>
-          <span>ResearchGate</span>
-        </a>
-
         <a class="link" href="https://linkedin.com/in/vandaido" target="_blank" rel="noopener">
-          <!-- LinkedIn -->
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M4.98 3.5a2.5 2.5 0 11-.02 5.001A2.5 2.5 0 014.98 3.5zM3 9h4v12H3zM10 9h3.8v1.7h.1c.5-.9 1.7-1.8 3.5-1.8 3.7 0 4.4 2.4 4.4 5.4V21h-4v-5.6c0-1.3 0-3-1.9-3s-2.2 1.4-2.2 2.9V21H10z"/>
-          </svg>
+          <span class="ico" aria-hidden="true">
+            <!-- LinkedIn -->
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4.98 3.5a2.5 2.5 0 11-.02 5.001A2.5 2.5 0 014.98 3.5zM3 9h4v12H3zM10 9h3.8v1.7h.1c.5-.9 1.7-1.8 3.5-1.8 3.7 0 4.4 2.4 4.4 5.4V21h-4v-5.6c0-1.3 0-3-1.9-3s-2.2 1.4-2.2 2.9V21H10z"/>
+            </svg>
+          </span>
           <span>LinkedIn</span>
         </a>
 
         <a class="link" href="https://github.com/Davido111200" target="_blank" rel="noopener">
-          <!-- GitHub -->
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.9 9.6.5.1.7-.2.7-.5v-2c-2.8.6-3.4-1.2-3.4-1.2-.4-1-1-1.3-1-1.3-.8-.5.1-.5.1-.5.9.1 1.3 1 1.3 1 .8 1.4 2.1 1 2.6.8.1-.6.3-1 .5-1.2-2.2-.3-4.6-1.2-4.6-5.4 0-1.2.4-2.1 1-2.9-.1-.3-.4-1.4.1-3 0 0 .8-.3 2.9 1.1a9.5 9.5 0 015.3 0c2.1-1.4 2.9-1.1 2.9-1.1.5 1.6.2 2.7.1 3 .6.8 1 1.7 1 2.9 0 4.2-2.4 5.1-4.7 5.4.3.2.6.7.6 1.5v2.3c0 .3.2.6.7.5 4-1.3 6.9-5 6.9-9.6C22 6.6 17.5 2 12 2z"/>
-          </svg>
+          <span class="ico" aria-hidden="true">
+            <!-- GitHub -->
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.9 9.6.5.1.7-.2.7-.5v-2c-2.8.6-3.4-1.2-3.4-1.2-.4-1-1-1.3-1-1.3-.8-.5.1-.5.1-.5.9.1 1.3 1 1.3 1 .8 1.4 2.1 1 2.6.8.1-.6.3-1 .5-1.2-2.2-.3-4.6-1.2-4.6-5.4 0-1.2.4-2.1 1-2.9-.1-.3-.4-1.4.1-3 0 0 .8-.3 2.9 1.1a9.5 9.5 0 015.3 0c2.1-1.4 2.9-1.1 2.9-1.1.5 1.6.2 2.7.1 3 .6.8 1 1.7 1 2.9 0 4.2-2.4 5.1-4.7 5.4.3.2.6.7.6 1.5v2.3c0 .3.2.6.7.5 4-1.3 6.9-5 6.9-9.6C22 6.6 17.5 2 12 2z"/>
+            </svg>
+          </span>
           <span>Github</span>
         </a>
 
-        <a class="link" href="https://scholar.google.com/citations?user=YOUR_ID" target="_blank" rel="noopener">
-          <!-- cap -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5a6 3 0 0012 0v-5"/>
-          </svg>
+        <a class="link" href="https://scholar.google.com/citations?user=FS9C_qgAAAAJ" target="_blank" rel="noopener">
+          <span class="ico" aria-hidden="true">
+            <!-- mortarboard -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5a6 3 0 0012 0v-5"/>
+            </svg>
+          </span>
           <span>Google Scholar</span>
-        </a>
-
-        <a class="link" href="https://orcid.org/YOUR_ID" target="_blank" rel="noopener">
-          <!-- circle 'i' -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><path d="M12 16v-5"/><circle cx="12" cy="8" r="1"/>
-          </svg>
-          <span>ORCID</span>
-        </a>
-
-        <a class="link" href="https://profiles.impactstory.org/" target="_blank" rel="noopener">
-          <!-- info -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
-          </svg>
-          <span>Impactstory</span>
         </a>
       </div>
 

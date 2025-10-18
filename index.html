@@ -291,6 +291,15 @@
     }
 
     /* Laptop-friendly discoverability */
+    .proj-nav{
+      position: absolute;
+      inset: 0;
+      display: none;           /* shown on hover devices below */
+      pointer-events: none;    /* let clicks pass EXCEPT on the buttons */
+      z-index: 3;              /* <— ensure above the cards */
+    }
+    @media (hover:hover){ .proj-nav{ display:block; } }
+
     .scroller-wrap{ position: relative; }
     .proj-row:focus{ outline: 2px solid var(--brand-2); outline-offset: 2px; }
     @media (hover:hover){
@@ -303,7 +312,6 @@
     }
     .proj-row > .card{ scroll-snap-stop: always; }
 
-    .proj-nav{ position: absolute; inset: 0; display:none; pointer-events:none; }
     @media (hover:hover){ .proj-nav{ display:block; } }
     .proj-btn{
       position:absolute; top:50%; translate:0 -50%;

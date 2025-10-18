@@ -680,6 +680,23 @@
         const step = card ? (card.getBoundingClientRect().width + gap) : scroller.clientWidth * 0.9;
         scroller.scrollBy({ left: dir * step, behavior: 'smooth' });
       };
+      const sections = [
+        ['about','pn-about'],
+        ['news','pn-news'],
+        ['projects','pn-projects'],
+        ['publications','pn-pubs'],
+        ['contact','pn-contact'],
+      ];
+      const opts = {root:null, rootMargin:'0px 0px -60% 0px', threshold:0.1};
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(entry => {
+          const id = entry.target.id;
+          const dot = document.getElementById('pn-' + id);
+          if(dot){ dot.classList.toggle('active', entry.isIntersecting); }
+        });
+      }, opts);
+      sections.forEach(([sid])=>{ const el = document.getElementById(sid); if(el) io.observe(el); });
+
       btnPrev?.addEventListener('click', () => stepByCard(-1));
       btnNext?.addEventListener('click', () => stepByCard(1));
 
@@ -689,6 +706,7 @@
         if (e.key === 'ArrowLeft')  { stepByCard(-1); e.preventDefault(); }
       });
     })();
+
   </script>
 
   <!-- Structured data -->

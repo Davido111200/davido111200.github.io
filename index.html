@@ -12,14 +12,16 @@
   <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2360a5fa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23g)'/%3E%3Ctext x='50' y='58' font-size='48' text-anchor='middle' font-family='system-ui,Segoe UI,Roboto' fill='%23011' %3ED%3C/text%3E%3C/svg%3E" />
   <style>
+    /* --- Background blur image --- */
     .bg-blur{
       position: fixed;
       inset: 0;
-      z-index: -1; /* behind everything */
-      background: center / cover no-repeat url("assets/bg.jpg"); /* put your image here */
+      z-index: 0;                  /* was -1: keep it above body background */
+      pointer-events: none;        /* don't block clicks */
+      background: center / cover no-repeat url("assets/bg.jpg");
       filter: blur(18px) saturate(110%);
-      transform: scale(1.08);   /* avoid edge clipping after blur */
-      opacity: 0.22;            /* tweak 0.15–0.35 to taste */
+      transform: scale(1.08);
+      opacity: 0.22;
       will-change: transform;
     }
     .bg-blur::after{
@@ -32,6 +34,10 @@
         rgba(0,0,0,0.35) 100%
       );
     }
+
+    /* ensure content layers above the bg */
+    .hero, .wrap { position: relative; z-index: 1; }
+
     /* keep content readable on top */
     section, .side, .hero{ backdrop-filter: saturate(120%) blur(0.5px); }
 
@@ -146,6 +152,45 @@
     /* Progress nav dot */
     .pn{width:8px; height:8px; border-radius:50%; background:var(--muted); opacity:.6; transition:scale .2s ease}
     .pn.active{background:var(--brand-2); opacity:1; scale:1.2}
+
+    :root { --avatar: 120px; }
+    @media (max-width: 980px){ :root{ --avatar: 92px; } }
+    @media (max-width: 640px){ :root{ --avatar: 80px; } }
+
+    .avatar-ring{
+      padding: 3px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+    .avatar{
+      width: var(--avatar);
+      height: var(--avatar);
+      display: block;
+      border-radius: 16px;
+      object-fit: cover;
+      background: none;
+      border: 1px solid color-mix(in oklab, var(--border), transparent 30%);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25) inset;
+    }
+
+    .btn{
+      display:inline-flex; align-items:center; gap:.6rem;
+      border:1px solid var(--border);
+      padding:.62rem .9rem;
+      border-radius:14px;
+      background:var(--card);
+      transition:transform .15s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: color-mix(in oklab, var(--brand-2), transparent 50%); }
+    .btn svg{ width:20px; height:20px; flex-shrink:0; }
+    .btn.primary{
+      background:linear-gradient(90deg, var(--brand), var(--brand-2));
+      color:#001b14; border-color:transparent; font-weight:700;
+    }
+
+    .name{ display:flex; align-items:center; gap:14px; }
+
   </style>
 </head>
 <body>
@@ -169,7 +214,9 @@
   <div class="wrap">
     <aside class="side" aria-label="Profile & navigation">
       <div class="name">
-        <img class="avatar" src="./assets/profile.jpg" alt="Portrait of Van Dai Do" />
+        <div class="avatar-ring">
+          <img class="avatar" src="./assets/profile.jpg" alt="Portrait of Van Dai Do" />
+        </div>
         <div>
           <h1 class="title">Van Dai Do</h1>
           <div class="muted">PhD @ Deakin A2I2</div>

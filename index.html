@@ -364,6 +364,7 @@
         <a class="toplink" href="#about"        data-section="about">About</a>
         <a class="toplink" href="#news"         data-section="news">News</a>
         <a class="toplink" href="#projects"     data-section="projects">Projects</a>
+        <a class="toplink" href="#analytics"    data-section="analytics">Visitors</a>
         <a class="toplink" href="#publications" data-section="publications">Publications</a>
         <a class="toplink" href="#contact"      data-section="contact">Contact</a>
       </nav>
@@ -555,6 +556,18 @@
         </div>
       </section>
 
+
+      <!-- New visitors map section -->
+      <section id="analytics" aria-labelledby="analytics-title">
+        <h2 id="analytics-title">Visitors</h2>
+        <p class="muted">Live view of where visitors are coming from.</p>
+        <div id="visitorsMap" style="width:100%; max-width:520px; margin:12px auto;">
+          <!-- Paste the map script provided by your analytics widget here -->
+        </div>
+      </section>
+
+
+
       <section id="publications" aria-labelledby="pubs-title">
         <h2 id="pubs-title">Publications</h2>
         <div class="list">
@@ -616,6 +629,9 @@
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
           Copy email address
         </button></p>
+
+        <!-- New: visit counter -->
+        <p class="muted" id="visitCounter">Total visits: …</p>
       </section>
 
       <footer>© <span id="y"></span> Van Dai Do </footer>
@@ -623,6 +639,29 @@
   </div>
 
   <script>
+    // === Visit counter using CountAPI ===
+    (function(){
+      const el = document.getElementById('visitCounter');
+      if(!el) return;
+
+      // Define a unique key for your site
+      const NAMESPACE = 'vandaido.github.io';
+      const KEY = 'homepage';
+
+      fetch(`https://api.countapi.xyz/hit/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && typeof data.value === 'number') {
+            el.textContent = `Total visits: ${data.value.toLocaleString()}`;
+          } else {
+            el.textContent = 'Total visits: (unavailable)';
+          }
+        })
+        .catch(() => {
+          el.textContent = 'Total visits: (unavailable)';
+        });
+    })();
+
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
@@ -669,7 +708,7 @@
     const setTopActive = (id) => {
       topLinks.forEach(a => a.classList.toggle('active', a.dataset.section === id));
     };
-    const sections = [['about'], ['news'], ['projects'], ['publications'], ['contact']];
+    const sections = [['about'], ['news'], ['projects'], ['analytics'], ['publications'], ['contact']];
 
     const io2 = new IntersectionObserver((entries)=>{
       let best = null;

@@ -231,7 +231,7 @@
     .pn{width:8px; height:8px; border-radius:50%; background:var(--muted); opacity:.6; transition:scale .2s ease}
     .pn.active{background:var(--brand-2); opacity:1; scale:1.2}
 
-    html, body { background: transparent !important; }
+    html, body { background: var(--bg) !important; }
 
     /* Background photo */
     .bg-blur{
@@ -244,16 +244,12 @@
     .bg-blur::after{ content: none; }
 
     /* Panels translucent */
-    :root{ --glass-dark: rgba(10,16,28,0.60); --glass-light: rgba(255,255,255,0.55); }
     section, .side, .hero{
-      background: var(--glass-dark);
+      background: var(--glass);
       -webkit-backdrop-filter: blur(6px) saturate(110%);
               backdrop-filter: blur(6px) saturate(110%);
-      border-color: rgba(255,255,255,0.08);
+      border-color: rgba(0,0,0,0.08);
     }
-    [data-theme="light"] section,
-    [data-theme="light"] .side,
-    [data-theme="light"] .hero{ background: var(--glass-light); border-color: rgba(0,0,0,0.08); }
 
     @media (max-width: 980px){
       .side{
@@ -477,7 +473,11 @@
         <h2 id="news-title">News</h2>
         <div class="list">
           <div class="item">
-            <div><strong>🎉1 paper accepted to TMLR</strong><br></div>
+            <div><strong>📖 I submitted my PhD thesis titled "Efficient and Safe Large Language Models with Reinforcement Learning" after 2 years and 5 months after starting the journey!</strong><br></div>
+            <time datetime="2026-01">Jan 2026</time>
+          </div>
+          <div class="item">
+            <div><strong>🎉1 paper accepted to TMLR with Journal to Conference (J2C) Certification!</strong><br></div>
             <time datetime="2025-10">Oct 2025</time>
           </div>
           <div class="item">

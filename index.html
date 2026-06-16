@@ -362,6 +362,7 @@
         <a class="toplink" href="#projects"     data-section="projects">Projects</a>
         <a class="toplink" href="#analytics"    data-section="analytics">Visitors</a>
         <a class="toplink" href="#publications" data-section="publications">Publications</a>
+        <a class="toplink" href="#service"      data-section="service">Service</a>
         <a class="toplink" href="#contact"      data-section="contact">Contact</a>
       </nav>
       <button id="themeBtn" class="toggle" aria-label="Toggle theme">
@@ -532,10 +533,8 @@
           </div>
         </div>
       </section>
-
       <section id="projects" aria-labelledby="projects-title">
         <h2 id="projects-title">Projects</h2>
-
         <div class="scroller-wrap">
           <div class="proj-row" id="projectsScroller" tabindex="0" aria-label="Project cards, horizontal scroll">
             <article class="card">
@@ -663,6 +662,24 @@
         </div>
       </section>
 
+      <section id="service" aria-labelledby="service-title">
+        <h2 id="service-title">Professional Service</h2>
+        <div class="list">
+          <div class="item">
+            <div><strong>Reviewer</strong> — ICML 2026 <span class="venue">Gold Reviewer</span></div>
+            <time datetime="2026">2026</time>
+          </div>
+          <div class="item">
+            <div><strong>Reviewer</strong> — ACL Rolling Review (ARR)</div>
+            <time datetime="2025">2025–</time>
+          </div>
+          <div class="item">
+            <div><strong>Reviewer</strong> — EMNLP</div>
+            <time datetime="2025">2025</time>
+          </div>
+        </div>
+      </section>
+
       <section id="contact" aria-labelledby="contact-title">
         <h2 id="contact-title">Contact</h2>
         <p>Email: <a href="mailto:v.do@deakin.edu.au">v.do@deakin.edu.au</a> · Phone: <a href="tel:+61412242886">+61 412 242 886</a></p>
@@ -760,7 +777,7 @@
     const setTopActive = (id) => {
       topLinks.forEach(a => a.classList.toggle('active', a.dataset.section === id));
     };
-    const sections = [['about'], ['news'], ['projects'], ['analytics'], ['publications'], ['contact']];
+    const sections = [['about'], ['news'], ['projects'], ['analytics'], ['publications'], ['service'], ['contact']];
 
     const io2 = new IntersectionObserver((entries)=>{
       let best = null;

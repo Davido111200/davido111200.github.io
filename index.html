@@ -695,7 +695,7 @@
         <p class="muted">Live view of where visitors are coming from.</p>
         <div id="visitorsMap"
             style="width:100%; max-width:520px; margin:12px auto; text-align:center;">
-          <!-- Paste the new provider's embed code here -->
+          <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=v4u8uN8OXhQBYTRvevZRYD3LtxaVx_pAZ4OguzT0k58&cl=ffffff&w=a"></script>
         </div>
       </section>
 
@@ -705,29 +705,6 @@
   </div>
 
   <script>
-    // === Visit counter using CountAPI ===
-    (function(){
-      const el = document.getElementById('visitCounter');
-      if(!el) return;
-
-      // Define a unique key for your site
-      const NAMESPACE = 'vandaido.github.io';
-      const KEY = 'homepage';
-
-      fetch(`https://api.countapi.xyz/hit/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(KEY)}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data && typeof data.value === 'number') {
-            el.textContent = `Total visits: ${data.value.toLocaleString()}`;
-          } else {
-            el.textContent = 'Total visits: (unavailable)';
-          }
-        })
-        .catch(() => {
-          el.textContent = 'Total visits: (unavailable)';
-        });
-    })();
-
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 

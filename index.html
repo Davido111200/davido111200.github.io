@@ -174,8 +174,6 @@
     }
     .venue.top{border-color:transparent; background:var(--accent-soft); color:var(--accent-ink)}
     .venue.gold{border-color:transparent; background:var(--gold-soft); color:var(--gold-ink)}
-    .legend{display:flex; align-items:center; gap:8px; margin:-6px 0 18px; color:var(--muted); font-size:.85rem}
-    .legend .venue{margin-left:0}
 
     /* Publications / grants: venue column on the left, so the coloured venue names line up */
     .pub{grid-template-columns:8.5rem minmax(0,1fr) auto; grid-template-areas:"venue body year"; column-gap:16px}
@@ -415,7 +413,6 @@
       <div class="panel" id="tab-publications" data-tab="publications">
         <section id="publications" aria-labelledby="pubs-title">
           <h2 id="pubs-title">Publications</h2>
-          <p class="legend"><span class="venue top">Blue</span> CORE A* conference (incl. Findings) or TMLR</p>
           <div class="list">
             <div class="item pub">
               <span class="venue top">NeurIPS 2026</span>

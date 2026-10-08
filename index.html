@@ -14,12 +14,15 @@
   <link rel="icon" href="./assets/icons/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="./assets/icons/favicon-16.png" sizes="16x16" type="image/png">
   <script>
-    // Runs before first paint: apply the saved theme and flag JS (so News collapses without a jump)
+    // Runs before first paint: saved theme, JS flag (News collapse) and the tab named in the URL (#publications, ...)
     (function(){
       var d = document.documentElement, t = 'light';
       d.classList.add('js');
       try { t = localStorage.getItem('theme-pref-vdd') || 'light'; } catch(e){}
       if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
+      var tabs = ['about', 'publications', 'grants', 'service', 'contact'];  // keep in sync with the .panel elements
+      var h = location.hash.slice(1);
+      d.setAttribute('data-tab', tabs.indexOf(h) > 0 ? h : 'about');
     })();
   </script>
   <style>
@@ -35,6 +38,8 @@
       --accent-soft:#e8eefc;
       --accent-ink:#1a4bb0;
       --on-accent:#ffffff;
+      --gold-soft:#fbf1d5;
+      --gold-ink:#875700;
       --shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
       --radius:14px;
       --maxw:1120px;
@@ -45,13 +50,13 @@
       :root:not([data-theme="light"]){
         --bg:#0e1116; --surface:#161a21; --surface-2:#1e232c; --text:#e6e8ec; --muted:#9aa3b0;
         --border:#272d38; --accent:#7eaaff; --accent-soft:rgba(126,170,255,.14); --accent-ink:#a8c5ff;
-        --on-accent:#0b1220; --shadow:none; color-scheme:dark;
+        --on-accent:#0b1220; --gold-soft:rgba(245,196,81,.14); --gold-ink:#f2c45a; --shadow:none; color-scheme:dark;
       }
     }
     :root[data-theme="dark"]{
       --bg:#0e1116; --surface:#161a21; --surface-2:#1e232c; --text:#e6e8ec; --muted:#9aa3b0;
       --border:#272d38; --accent:#7eaaff; --accent-soft:rgba(126,170,255,.14); --accent-ink:#a8c5ff;
-      --on-accent:#0b1220; --shadow:none; color-scheme:dark;
+      --on-accent:#0b1220; --gold-soft:rgba(245,196,81,.14); --gold-ink:#f2c45a; --shadow:none; color-scheme:dark;
     }
     @media (prefers-reduced-motion: reduce){
       *{animation-duration:.001ms!important; transition-duration:.001ms!important; scroll-behavior:auto!important}
@@ -67,14 +72,13 @@
     p{margin:0}
     [hidden]{display:none!important}
     :where(a,button):focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
+    h2[tabindex="-1"]:focus{outline:none}
     .muted{color:var(--muted)}
 
-    /* ===== Top bar ===== */
+    /* ===== Top bar (tabs) ===== */
     .topbar{
       position:sticky; top:0; z-index:10; height:var(--topbar-h);
       background:var(--surface);
-      background:color-mix(in srgb, var(--surface) 88%, transparent);
-      -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
       border-bottom:1px solid var(--border);
     }
     .topbar-inner{max-width:var(--maxw); height:100%; margin:0 auto; padding:0 24px; display:flex; align-items:center; gap:16px}
@@ -84,7 +88,12 @@
     .topnav::-webkit-scrollbar{display:none}
     .toplink{padding:.35rem .7rem; border-radius:8px; color:var(--muted); font-size:.93rem; white-space:nowrap}
     .toplink:hover{color:var(--text); background:var(--surface-2); text-decoration:none}
-    .toplink.active{color:var(--accent-ink); background:var(--accent-soft)}
+    /* Active tab (driven by data-tab on <html>, so it is right before any script runs) */
+    :root[data-tab="about"]        .toplink[data-tab="about"],
+    :root[data-tab="publications"] .toplink[data-tab="publications"],
+    :root[data-tab="grants"]       .toplink[data-tab="grants"],
+    :root[data-tab="service"]      .toplink[data-tab="service"],
+    :root[data-tab="contact"]      .toplink[data-tab="contact"]{color:var(--accent-ink); background:var(--accent-soft)}
     .toggle{
       display:inline-flex; align-items:center; gap:6px; flex-shrink:0;
       padding:.3rem .7rem; border:1px solid var(--border); border-radius:999px;
@@ -95,7 +104,7 @@
 
     /* ===== Layout ===== */
     .wrap{display:grid; grid-template-columns:280px minmax(0,1fr); gap:24px; align-items:start; max-width:var(--maxw); margin:0 auto; padding:28px 24px 40px}
-    main{display:grid; gap:20px; min-width:0}
+    main{min-width:0}
     section{
       background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
       padding:24px 28px; box-shadow:var(--shadow);
@@ -104,6 +113,18 @@
     section h2{font-size:1.2rem; margin-bottom:16px; display:flex; align-items:center; gap:10px}
     section h2::before{content:""; width:4px; height:1.1em; border-radius:2px; background:var(--accent)}
     .lead{max-width:70ch}
+
+    /* ===== Tab panels =====
+       Inactive panels collapse to zero height instead of display:none, so they keep their width:
+       the visitor-map widget sizes itself from its container when it loads, even inside a hidden tab. */
+    .panel{display:grid; gap:20px}
+    .panel + .panel{margin-top:20px}
+    .js .panel{height:0; overflow:hidden; visibility:hidden; margin-top:0}
+    :root[data-tab="about"]        #tab-about,
+    :root[data-tab="publications"] #tab-publications,
+    :root[data-tab="grants"]       #tab-grants,
+    :root[data-tab="service"]      #tab-service,
+    :root[data-tab="contact"]      #tab-contact{height:auto; overflow:visible; visibility:visible}
 
     /* ===== Sidebar ===== */
     .side{
@@ -136,19 +157,31 @@
     .tools{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border)}
     .chip{font-size:.78rem; padding:.18rem .6rem; border-radius:999px; background:var(--surface-2); color:var(--muted)}
 
-    /* ===== Lists (news, publications, service) ===== */
+    /* ===== Lists (news, publications, grants, service) ===== */
     .list{display:grid}
     .item{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 16px; padding:12px 0; border-top:1px solid var(--border)}
     .item:first-child{border-top:none; padding-top:0}
     .item:last-child{padding-bottom:0}
     .item time{color:var(--muted); font-size:.88rem; white-space:nowrap; font-variant-numeric:tabular-nums; padding-top:2px}
-    .venue{
-      display:inline-block; margin-left:.35rem; padding:.05rem .5rem; border-radius:999px;
-      background:var(--accent-soft); color:var(--accent-ink);
-      font-size:.75rem; font-weight:600; white-space:nowrap; vertical-align:1px;
-    }
     .authors{color:var(--muted); font-size:.93rem; margin-top:3px}
     .authors .me{color:var(--text); font-weight:600}
+
+    /* Venue tags: grey by default; .top = CORE A* conference (incl. Findings) or TMLR, shown in blue */
+    .venue{
+      display:inline-block; margin-left:.35rem; padding:.05rem .5rem; border-radius:999px;
+      border:1px solid var(--border); background:var(--surface-2); color:var(--muted);
+      font-size:.75rem; font-weight:600; white-space:nowrap; vertical-align:1px;
+    }
+    .venue.top{border-color:transparent; background:var(--accent-soft); color:var(--accent-ink)}
+    .venue.gold{border-color:transparent; background:var(--gold-soft); color:var(--gold-ink)}
+    .legend{display:flex; align-items:center; gap:8px; margin:-6px 0 18px; color:var(--muted); font-size:.85rem}
+    .legend .venue{margin-left:0}
+
+    /* Publications / grants: venue column on the left, so the coloured venue names line up */
+    .pub{grid-template-columns:8.5rem minmax(0,1fr) auto; grid-template-areas:"venue body year"; column-gap:16px}
+    .pub > .venue{grid-area:venue; align-self:start; margin:2px 0 0; padding:.15rem .4rem; border-radius:6px; text-align:center}
+    .pub > div{grid-area:body}
+    .pub > time{grid-area:year}
 
     /* News: date column on the left, first NEWS_LIMIT (=5) items shown until expanded */
     #news .item{grid-template-columns:5.5rem minmax(0,1fr); padding:7px 0; border-top:none}
@@ -163,8 +196,10 @@
     .more-btn svg{width:16px; height:16px; transition:transform .2s ease}
     .more-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
 
+    .empty{padding:18px; border:1px dashed var(--border); border-radius:10px; text-align:center}
+
     /* ===== Footer ===== */
-    footer{color:var(--muted); text-align:center; font-size:.9rem; padding:8px 0 0}
+    footer{color:var(--muted); text-align:center; font-size:.9rem; padding:28px 0 0}
 
     /* ===== Responsive ===== */
     @media (max-width: 900px){
@@ -172,28 +207,37 @@
       .side{position:static}
       .links{flex-direction:row; flex-wrap:wrap; justify-content:center; gap:2px 4px}
       section{padding:20px}
+      .panel{gap:16px}
     }
     @media (max-width: 640px){
       .topbar-inner{padding:0 12px; gap:8px}
       .topbrand{display:none}
       .topnav{margin-left:0; flex:1; min-width:0}
+      .topnav{gap:0}
+      .toplink{padding:.35rem .4rem; font-size:.85rem}
+      .toggle{padding:.3rem .4rem}
       #themeLabel{display:none}
       #news .item{grid-template-columns:1fr; gap:0}
+      .pub{grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"venue year" "body body"; row-gap:6px}
+      .pub > .venue{justify-self:start}
+    }
+    @media (max-width: 400px){
+      .topbar-inner{padding:0 8px; gap:4px}
+      .toplink{padding:.35rem .3rem; font-size:.8rem}
     }
   </style>
 </head>
 <body>
-  <!-- Top in-page nav bar -->
-  <div class="topbar" role="navigation" aria-label="In-page navigation">
+  <!-- Top bar: each link opens a tab (the matching .panel below) -->
+  <div class="topbar" role="navigation" aria-label="Site sections">
     <div class="topbar-inner">
       <a class="topbrand" href="#about">Van Dai Do</a>
       <nav class="topnav">
-        <a class="toplink" href="#about"        data-section="about">About</a>
-        <a class="toplink" href="#news"         data-section="news">News</a>
-        <a class="toplink" href="#publications" data-section="publications">Publications</a>
-        <a class="toplink" href="#service"      data-section="service">Service</a>
-        <a class="toplink" href="#contact"      data-section="contact">Contact</a>
-        <a class="toplink" href="#analytics"    data-section="analytics">Visitors</a>
+        <a class="toplink" href="#about"        data-tab="about">About</a>
+        <a class="toplink" href="#publications" data-tab="publications">Publications</a>
+        <a class="toplink" href="#grants"       data-tab="grants">Grants</a>
+        <a class="toplink" href="#service"      data-tab="service">Service</a>
+        <a class="toplink" href="#contact"      data-tab="contact">Contact</a>
       </nav>
       <button id="themeBtn" class="toggle" type="button" aria-label="Toggle colour theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4 12H2m20 0h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M5 19l1.5-1.5"/></svg>
@@ -203,7 +247,7 @@
   </div>
 
   <div class="wrap">
-    <aside class="side" aria-label="Profile & navigation">
+    <aside class="side" aria-label="Profile">
       <div class="profile">
         <img class="avatar" src="./assets/profile.jpg" alt="Portrait of Van Dai Do" />
         <h1 class="title">Van Dai Do</h1>
@@ -264,221 +308,262 @@
     </aside>
 
     <main>
-      <section id="about" aria-labelledby="about-title">
-        <h2 id="about-title">About</h2>
-        <p class="lead">
-          My name is Van Dai Do. I build efficient & safe LLMs—reinforcement learning, activation steering with memory, and retrieval-guided decoding. Additionally, I work on time-series forecasting, mostly with foundational models and edit-based methods. I am currently an Associate Research Fellow at Deakin University’s Applied AI Institute (A2I2).
-        </p>
-      </section>
+      <!-- ===== Tab: About (About + News + Visitors) ===== -->
+      <div class="panel" id="tab-about" data-tab="about">
+        <section id="about" aria-labelledby="about-title">
+          <h2 id="about-title">About</h2>
+          <p class="lead">
+            My name is Van Dai Do. I build efficient & safe LLMs—reinforcement learning, activation steering with memory, and retrieval-guided decoding. Additionally, I work on time-series forecasting, mostly with foundational models and edit-based methods. I am currently an Associate Research Fellow at Deakin University’s Applied AI Institute (A2I2).
+          </p>
+        </section>
 
-      <!-- News: newest first. Only the first 5 show until "Show all" is clicked (NEWS_LIMIT). -->
-      <section id="news" aria-labelledby="news-title">
-        <h2 id="news-title">News</h2>
-        <div class="list" id="newsList">
-          <div class="item">
-            <time datetime="2026-09">Sep 2026</time>
-            <div>🎉 1 paper accepted to NeurIPS 2026, and another accepted in TMLR</div>
+        <!-- News: newest first. Only the first 5 show until "Show all" is clicked (NEWS_LIMIT). -->
+        <section id="news" aria-labelledby="news-title">
+          <h2 id="news-title">News</h2>
+          <div class="list" id="newsList">
+            <div class="item">
+              <time datetime="2026-09">Sep 2026</time>
+              <div>🎉 1 paper accepted to NeurIPS 2026, and another accepted in TMLR</div>
+            </div>
+            <div class="item">
+              <time datetime="2026-08">Aug 2026</time>
+              <div>🔊 Our tutorial got accepted at ACML 2026! See you in Melbourne!</div>
+            </div>
+            <div class="item">
+              <time datetime="2026-08">Aug 2026</time>
+              <div>🎉 1 paper accepted to EMNLP 2026</div>
+            </div>
+            <div class="item">
+              <time datetime="2026-05">May 2026</time>
+              <div>🔊 I was awarded "Gold Reviewer" for ICML 2026!</div>
+            </div>
+            <div class="item">
+              <time datetime="2026-05">May 2026</time>
+              <div>🎉 1 paper accepted to ICML 2026</div>
+            </div>
+            <div class="item">
+              <time datetime="2026-04">Apr 2026</time>
+              <div>🎉 1 paper accepted to ACL 2026</div>
+            </div>
+            <div class="item">
+              <time datetime="2026-01">Jan 2026</time>
+              <div>📖 I submitted my PhD thesis titled “Efficient and Safe Large Language Models with Reinforcement Learning” after 2 years and 5 months on this journey! Very grateful for the support of my great supervisors <a href="https://thaihungle.github.io" target="_blank" rel="noopener">Dr. Hung Le</a> and <a href="https://svethav.github.io" target="_blank" rel="noopener">Professor Svetha Venkatesh</a>.</div>
+            </div>
+            <div class="item">
+              <time datetime="2025-10">Oct 2025</time>
+              <div>🔊 I am invited to present my <a href="https://aclanthology.org/2025.findings-acl.706/" target="_blank" rel="noopener">ACL 2025 poster</a> at Kingston AI Group Symposium 2026, held by <a href="https://adelaideuni.edu.au/research/australian-institute-for-machine-learning/" target="_blank" rel="noopener">Australian Institute for Machine Learning</a> (AIML) at Adelaide!</div>
+            </div>
+            <div class="item">
+              <time datetime="2025-10">Oct 2025</time>
+              <div>🎉 1 paper accepted to TMLR with Journal to Conference (J2C) Certification!</div>
+            </div>
+            <div class="item">
+              <time datetime="2025-09">Sep 2025</time>
+              <div>🎉 1 paper accepted to ICDM 2025</div>
+            </div>
+            <div class="item">
+              <time datetime="2025-08">Aug 2025</time>
+              <div>🎉 I won the 3-Minute Thesis (3MT) competition hosted by Deakin’s A2I2. What a great journey—grateful for the experience and everyone who supported me along the way.</div>
+            </div>
+            <div class="item">
+              <time datetime="2025-08">Aug 2025</time>
+              <div>🎉 1 paper accepted to EMNLP 2025</div>
+            </div>
+            <div class="item">
+              <time datetime="2025-05">May 2025</time>
+              <div>🎉 1 paper accepted to ACL 2025</div>
+            </div>
+            <div class="item">
+              <time datetime="2025-02">Feb 2025</time>
+              <div>📖 I started working as a Research Assistant under Dr. Hung Le's supervision on the Australian Research Council (ARC) DECRA grant to implement innovative time series forecasting models.</div>
+            </div>
+            <div class="item">
+              <time datetime="2024-07">Jul 2024</time>
+              <div>🎉 1 paper accepted to ECAI 2024</div>
+            </div>
+            <div class="item">
+              <time datetime="2023-10">Oct 2023</time>
+              <div>📖 Invited tutorial at AAMAS</div>
+            </div>
+            <div class="item">
+              <time datetime="2023-08">Aug 2023</time>
+              <div>🛫 I started my PhD journey at Applied Artificial Intelligence Initiative (A2I2), Deakin University, Australia with a full-ride HDR scholarship!</div>
+            </div>
           </div>
-          <div class="item">
-            <time datetime="2026-08">Aug 2026</time>
-            <div>🔊 Our tutorial got accepted at ACML 2026! See you in Melbourne!</div>
-          </div>
-          <div class="item">
-            <time datetime="2026-08">Aug 2026</time>
-            <div>🎉 1 paper accepted to EMNLP 2026</div>
-          </div>
-          <div class="item">
-            <time datetime="2026-05">May 2026</time>
-            <div>🔊 I was awarded "Gold Reviewer" for ICML 2026!</div>
-          </div>
-          <div class="item">
-            <time datetime="2026-05">May 2026</time>
-            <div>🎉 1 paper accepted to ICML 2026</div>
-          </div>
-          <div class="item">
-            <time datetime="2026-04">Apr 2026</time>
-            <div>🎉 1 paper accepted to ACL 2026</div>
-          </div>
-          <div class="item">
-            <time datetime="2026-01">Jan 2026</time>
-            <div>📖 I submitted my PhD thesis titled “Efficient and Safe Large Language Models with Reinforcement Learning” after 2 years and 5 months on this journey! Very grateful for the support of my great supervisors <a href="https://thaihungle.github.io" target="_blank" rel="noopener">Dr. Hung Le</a> and <a href="https://svethav.github.io" target="_blank" rel="noopener">Professor Svetha Venkatesh</a>.</div>
-          </div>
-          <div class="item">
-            <time datetime="2025-10">Oct 2025</time>
-            <div>🔊 I am invited to present my <a href="https://aclanthology.org/2025.findings-acl.706/" target="_blank" rel="noopener">ACL 2025 poster</a> at Kingston AI Group Symposium 2026, held by <a href="https://adelaideuni.edu.au/research/australian-institute-for-machine-learning/" target="_blank" rel="noopener">Australian Institute for Machine Learning</a> (AIML) at Adelaide!</div>
-          </div>
-          <div class="item">
-            <time datetime="2025-10">Oct 2025</time>
-            <div>🎉 1 paper accepted to TMLR with Journal to Conference (J2C) Certification!</div>
-          </div>
-          <div class="item">
-            <time datetime="2025-09">Sep 2025</time>
-            <div>🎉 1 paper accepted to ICDM 2025</div>
-          </div>
-          <div class="item">
-            <time datetime="2025-08">Aug 2025</time>
-            <div>🎉 I won the 3-Minute Thesis (3MT) competition hosted by Deakin’s A2I2. What a great journey—grateful for the experience and everyone who supported me along the way.</div>
-          </div>
-          <div class="item">
-            <time datetime="2025-08">Aug 2025</time>
-            <div>🎉 1 paper accepted to EMNLP 2025</div>
-          </div>
-          <div class="item">
-            <time datetime="2025-05">May 2025</time>
-            <div>🎉 1 paper accepted to ACL 2025</div>
-          </div>
-          <div class="item">
-            <time datetime="2025-02">Feb 2025</time>
-            <div>📖 I started working as a Research Assistant under Dr. Hung Le's supervision on the Australian Research Council (ARC) DECRA grant to implement innovative time series forecasting models.</div>
-          </div>
-          <div class="item">
-            <time datetime="2024-07">Jul 2024</time>
-            <div>🎉 1 paper accepted to ECAI 2024</div>
-          </div>
-          <div class="item">
-            <time datetime="2023-10">Oct 2023</time>
-            <div>📖 Invited tutorial at AAMAS</div>
-          </div>
-          <div class="item">
-            <time datetime="2023-08">Aug 2023</time>
-            <div>🛫 I started my PhD journey at Applied Artificial Intelligence Initiative (A2I2), Deakin University, Australia with a full-ride HDR scholarship!</div>
-          </div>
-        </div>
-        <button type="button" class="more-btn" id="newsToggle" aria-controls="newsList" aria-expanded="false" hidden>
-          <span id="newsToggleLabel">Show all</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-      </section>
+          <button type="button" class="more-btn" id="newsToggle" aria-controls="newsList" aria-expanded="false" hidden>
+            <span id="newsToggleLabel">Show all</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </section>
 
-      <section id="publications" aria-labelledby="pubs-title">
-        <h2 id="pubs-title">Publications</h2>
-        <div class="list">
-          <div class="item">
-            <div>
-              <strong>SteerCast: Retrieval-Based Latent Steering for Decoder-Only Time Series Forecasting</strong>
-              <span class="venue">NeurIPS 2026</span>
-              <div class="authors"><span class="me">Van Dai Do</span>, Huu Hiep Nguyen, Minh Hoang Nguyen, Hung Le</div>
-            </div>
-            <time datetime="2026">2026</time>
+        <section id="analytics" aria-labelledby="analytics-title">
+          <h2 id="analytics-title">Visitors</h2>
+          <p class="muted">Live view of where visitors are coming from.</p>
+          <div id="visitorsMap"
+              style="width:100%; max-width:520px; margin:12px auto 0; text-align:center;">
+            <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=v4u8uN8OXhQBYTRvevZRYD3LtxaVx_pAZ4OguzT0k58&cl=ffffff&w=a"></script>
           </div>
-          <div class="item">
-            <div>
-              <strong>CausalPlan: Empowering Efficient LLM Multi-Agent Coordination Through Causality-Driven Planning</strong>
-              <span class="venue">TMLR</span>
-              <div class="authors">Minh Hoang Nguyen, <span class="me">Van Dai Do</span>, Dung Nguyen, Thin Nguyen, Hung Le</div>
+        </section>
+      </div>
+
+      <!-- ===== Tab: Publications ===== -->
+      <!-- Venue tag: class="venue top" (blue) for CORE A* conferences incl. Findings, and TMLR; plain class="venue" (grey) otherwise -->
+      <div class="panel" id="tab-publications" data-tab="publications">
+        <section id="publications" aria-labelledby="pubs-title">
+          <h2 id="pubs-title">Publications</h2>
+          <p class="legend"><span class="venue top">Blue</span> CORE A* conference (incl. Findings) or TMLR</p>
+          <div class="list">
+            <div class="item pub">
+              <span class="venue top">NeurIPS 2026</span>
+              <div>
+                <strong>SteerCast: Retrieval-Based Latent Steering for Decoder-Only Time Series Forecasting</strong>
+                <div class="authors"><span class="me">Van Dai Do</span>, Huu Hiep Nguyen, Minh Hoang Nguyen, Hung Le</div>
+              </div>
+              <time datetime="2026">2026</time>
             </div>
-            <time datetime="2026">2026</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>SPaCe: Unlocking Sample-Efficient Large Language Models Training With Self-Pace Curriculum Learning</strong>
-              <span class="venue">ACL 2026</span>
-              <div class="authors"><span class="me">Van Dai Do</span>, Manh Nguyen, Svetha Venkatesh, Hung Le — <a href="https://arxiv.org/abs/2508.05015" target="_blank" rel="noopener">PDF</a></div>
+            <div class="item pub">
+              <span class="venue top">TMLR</span>
+              <div>
+                <strong>CausalPlan: Empowering Efficient LLM Multi-Agent Coordination Through Causality-Driven Planning</strong>
+                <div class="authors">Minh Hoang Nguyen, <span class="me">Van Dai Do</span>, Dung Nguyen, Thin Nguyen, Hung Le</div>
+              </div>
+              <time datetime="2026">2026</time>
             </div>
-            <time datetime="2026">2026</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>Reviving Error Correction in Modern Deep Time-Series Forecasting</strong>
-              <span class="venue">ICML 2026</span>
-              <div class="authors">Minh Hoang Nguyen, <span class="me">Van Dai Do</span>, Huu Hiep Nguyen, Dung Nguyen, Kien Do, Hung Le — <a href="https://icml.cc/virtual/2026/poster/63134" target="_blank" rel="noopener">OpenReview</a></div>
+            <div class="item pub">
+              <span class="venue top">ACL 2026</span>
+              <div>
+                <strong>SPaCe: Unlocking Sample-Efficient Large Language Models Training With Self-Pace Curriculum Learning</strong>
+                <div class="authors"><span class="me">Van Dai Do</span>, Manh Nguyen, Svetha Venkatesh, Hung Le — <a href="https://arxiv.org/abs/2508.05015" target="_blank" rel="noopener">PDF</a></div>
+              </div>
+              <time datetime="2026">2026</time>
             </div>
-            <time datetime="2026">2026</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>Dynamic Steering With Episodic Memory For Large Language Models</strong>
-              <span class="venue">ACL 2025</span>
-              <div class="authors"><span class="me">Van Dai Do</span>, Quan Tran, Svetha Venkatesh, Hung Le — <a href="https://aclanthology.org/2025.findings-acl.706/" target="_blank" rel="noopener">PDF</a> · <a href="https://github.com/Davido111200/DSEM" target="_blank" rel="noopener">Code</a></div>
+            <div class="item pub">
+              <span class="venue top">ICML 2026</span>
+              <div>
+                <strong>Reviving Error Correction in Modern Deep Time-Series Forecasting</strong>
+                <div class="authors">Minh Hoang Nguyen, <span class="me">Van Dai Do</span>, Huu Hiep Nguyen, Dung Nguyen, Kien Do, Hung Le — <a href="https://icml.cc/virtual/2026/poster/63134" target="_blank" rel="noopener">OpenReview</a></div>
+              </div>
+              <time datetime="2026">2026</time>
             </div>
-            <time datetime="2025">2025</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>Sample Efficient Alignment Learning With Episodic Control</strong>
-              <span class="venue">EMNLP 2025</span>
-              <div class="authors"><span class="me">Van Dai Do</span>, Quan Tran, Ahmed Kirmani, Lu Zhang, Hung Le</div>
+            <div class="item pub">
+              <span class="venue top">ACL 2025</span>
+              <div>
+                <strong>Dynamic Steering With Episodic Memory For Large Language Models</strong>
+                <div class="authors"><span class="me">Van Dai Do</span>, Quan Tran, Svetha Venkatesh, Hung Le — <a href="https://aclanthology.org/2025.findings-acl.706/" target="_blank" rel="noopener">PDF</a> · <a href="https://github.com/Davido111200/DSEM" target="_blank" rel="noopener">Code</a></div>
+              </div>
+              <time datetime="2025">2025</time>
             </div>
-            <time datetime="2025">2025</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>Reasoning Under 1 Billion: Memory-Augmented Reinforcement Learning for Large Language Models</strong>
-              <span class="venue">TMLR 2025</span>
-              <div class="authors">Hung Le, <span class="me">Van Dai Do</span>, Dung Nguyen, Svetha Venkatesh</div>
+            <div class="item pub">
+              <span class="venue top">EMNLP 2025</span>
+              <div>
+                <strong>Sample Efficient Alignment Learning With Episodic Control</strong>
+                <div class="authors"><span class="me">Van Dai Do</span>, Quan Tran, Ahmed Kirmani, Lu Zhang, Hung Le</div>
+              </div>
+              <time datetime="2025">2025</time>
             </div>
-            <time datetime="2025">2025</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>Accelerating Long-Term Molecular Dynamics with Physics-Informed Time-Series Forecasting</strong>
-              <span class="venue">ICDM 2025</span>
-              <div class="authors">Hung Le, Sherif Abbas, Minh Hoang Nguyen, <span class="me">Van Dai Do</span>, Huu Hiep Nguyen, Dung Nguyen</div>
+            <div class="item pub">
+              <span class="venue top">TMLR 2025</span>
+              <div>
+                <strong>Reasoning Under 1 Billion: Memory-Augmented Reinforcement Learning for Large Language Models</strong>
+                <div class="authors">Hung Le, <span class="me">Van Dai Do</span>, Dung Nguyen, Svetha Venkatesh</div>
+              </div>
+              <time datetime="2025">2025</time>
             </div>
-            <time datetime="2025">2025</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>Large Language Models Prompting With Episodic Memory</strong>
+            <div class="item pub">
+              <span class="venue top">ICDM 2025</span>
+              <div>
+                <strong>Accelerating Long-Term Molecular Dynamics with Physics-Informed Time-Series Forecasting</strong>
+                <div class="authors">Hung Le, Sherif Abbas, Minh Hoang Nguyen, <span class="me">Van Dai Do</span>, Huu Hiep Nguyen, Dung Nguyen</div>
+              </div>
+              <time datetime="2025">2025</time>
+            </div>
+            <div class="item pub">
               <span class="venue">ECAI 2024 (Oral)</span>
-              <div class="authors"><span class="me">Van Dai Do</span>, Quan Tran, Svetha Venkatesh, Hung Le — <a href="https://github.com/Davido111200/Prompting_With_Episodic_Memory" target="_blank" rel="noopener">Code</a></div>
+              <div>
+                <strong>Large Language Models Prompting With Episodic Memory</strong>
+                <div class="authors"><span class="me">Van Dai Do</span>, Quan Tran, Svetha Venkatesh, Hung Le — <a href="https://github.com/Davido111200/Prompting_With_Episodic_Memory" target="_blank" rel="noopener">Code</a></div>
+              </div>
+              <time datetime="2024">2024</time>
             </div>
-            <time datetime="2024">2024</time>
-          </div>
-          <div class="item">
-            <div>
-              <strong>Deep RL for Multi-Hop Offloading in UAV-Assisted Edge Computing</strong>
+            <div class="item pub">
               <span class="venue">IEEE TVT 2023</span>
-              <div class="authors">Nguyen Tien Hoa, <span class="me">Van Dai Do</span>, Le Hoang Lan, Nguyen Cong Luong, Duc Van Le, Dusit Niyato — <a href="https://ieeexplore.ieee.org/abstract/document/10174680" target="_blank" rel="noopener">Link</a></div>
+              <div>
+                <strong>Deep RL for Multi-Hop Offloading in UAV-Assisted Edge Computing</strong>
+                <div class="authors">Nguyen Tien Hoa, <span class="me">Van Dai Do</span>, Le Hoang Lan, Nguyen Cong Luong, Duc Van Le, Dusit Niyato — <a href="https://ieeexplore.ieee.org/abstract/document/10174680" target="_blank" rel="noopener">Link</a></div>
+              </div>
+              <time datetime="2023">2023</time>
             </div>
-            <time datetime="2023">2023</time>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <section id="service" aria-labelledby="service-title">
-        <h2 id="service-title">Professional Service</h2>
-        <div class="list">
-          <div class="item">
-            <div><strong>Reviewer</strong> — AAAI</div>
-            <time datetime="2026">2026–</time>
+      <!-- ===== Tab: Grants ===== -->
+      <div class="panel" id="tab-grants" data-tab="grants">
+        <section id="grants" aria-labelledby="grants-title">
+          <h2 id="grants-title">Grants</h2>
+          <!-- One .item per grant, newest first.
+          <div class="item pub">
+            <span class="venue top">Funder</span>
+            <div>
+              <strong>Project title</strong>
+              <div class="authors">Scheme · Role (e.g. Chief Investigator) · Amount</div>
+            </div>
+            <time datetime="2026">2026–2028</time>
           </div>
-          <div class="item">
-            <div><strong>Reviewer</strong> — TMLR</div>
-            <time datetime="2026">2026–</time>
+          -->
+          <div class="list" id="grantsList">
+            <div class="item pub">
+              <span class="venue top">Lambda</span>
+              <div>
+                <strong>Lambda Research Grant Program</strong>
+                <div class="authors">GPU cloud compute credits for AI research</div>
+              </div>
+              <time datetime="2026">2026</time>
+            </div>
           </div>
-          <div class="item">
-            <div><strong>Reviewer</strong> — NeurIPS 2026</div>
-            <time datetime="2026">2026–</time>
-          </div>
-          <div class="item">
-            <div><strong>Reviewer</strong> — ICML 2026 <span class="venue">Gold Reviewer</span></div>
-            <time datetime="2026">2026</time>
-          </div>
-          <div class="item">
-            <div><strong>Reviewer</strong> — ACL Rolling Review (ARR)</div>
-            <time datetime="2025">2025–</time>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <section id="contact" aria-labelledby="contact-title">
-        <h2 id="contact-title">Contact</h2>
-        <p>Email: <a href="mailto:v.do@deakin.edu.au">v.do@deakin.edu.au</a> · Phone: <a href="tel:+61412242886">+61 412 242 886</a></p>
-        <p style="margin-top:14px"><button id="copyBtn" class="btn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          <span id="copyLabel" aria-live="polite">Copy email address</span>
-        </button></p>
-      </section>
+      <!-- ===== Tab: Service ===== -->
+      <div class="panel" id="tab-service" data-tab="service">
+        <section id="service" aria-labelledby="service-title">
+          <h2 id="service-title">Professional Service</h2>
+          <div class="list">
+            <div class="item">
+              <div><strong>Reviewer</strong> — AAAI</div>
+              <time datetime="2026">2026–</time>
+            </div>
+            <div class="item">
+              <div><strong>Reviewer</strong> — TMLR</div>
+              <time datetime="2026">2026–</time>
+            </div>
+            <div class="item">
+              <div><strong>Reviewer</strong> — NeurIPS 2026</div>
+              <time datetime="2026">2026–</time>
+            </div>
+            <div class="item">
+              <div><strong>Reviewer</strong> — ICML 2026 <span class="venue gold">Gold Reviewer</span></div>
+              <time datetime="2026">2026</time>
+            </div>
+            <div class="item">
+              <div><strong>Reviewer</strong> — ACL Rolling Review (ARR)</div>
+              <time datetime="2025">2025–</time>
+            </div>
+          </div>
+        </section>
+      </div>
 
-      <section id="analytics" aria-labelledby="analytics-title">
-        <h2 id="analytics-title">Visitors</h2>
-        <p class="muted">Live view of where visitors are coming from.</p>
-        <div id="visitorsMap"
-            style="width:100%; max-width:520px; margin:12px auto 0; text-align:center;">
-          <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=v4u8uN8OXhQBYTRvevZRYD3LtxaVx_pAZ4OguzT0k58&cl=ffffff&w=a"></script>
-        </div>
-      </section>
+      <!-- ===== Tab: Contact ===== -->
+      <div class="panel" id="tab-contact" data-tab="contact">
+        <section id="contact" aria-labelledby="contact-title">
+          <h2 id="contact-title">Contact</h2>
+          <p>Email: <a href="mailto:v.do@deakin.edu.au">v.do@deakin.edu.au</a> · Phone: <a href="tel:+61412242886">+61 412 242 886</a></p>
+          <p style="margin-top:14px"><button id="copyBtn" class="btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copyLabel" aria-live="polite">Copy email address</span>
+          </button></p>
+        </section>
+      </div>
 
       <footer>© <span id="y"></span> Van Dai Do</footer>
     </main>
@@ -488,8 +573,9 @@
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Theme toggle (auto / light / dark); the <head> script applies the saved choice before paint
     const root = document.documentElement;
+
+    // Theme toggle (auto / light / dark); the <head> script applies the saved choice before paint
     const themeLabel = document.getElementById('themeLabel');
     const THEME_KEY = 'theme-pref-vdd';
     const MODES = ['auto', 'light', 'dark'];
@@ -507,6 +593,55 @@
       try { localStorage.setItem(THEME_KEY, themeMode); } catch(e){}
       applyTheme(themeMode);
     });
+
+    // Tabs: the URL hash picks the tab (#publications, #grants, ...); links to a section inside a tab (#news) open that tab
+    (function(){
+      const panels = Array.from(document.querySelectorAll('.panel'));
+      const links = Array.from(document.querySelectorAll('.toplink'));
+      const main = document.querySelector('main');
+      const topbar = document.querySelector('.topbar');
+      const hashId = () => decodeURIComponent(location.hash.slice(1));
+      const tabFor = (id) => {
+        const el = id ? document.getElementById(id) : null;
+        const panel = el ? el.closest('.panel') : null;
+        return panel ? panel.dataset.tab : 'about';
+      };
+      const show = (tab) => {
+        root.setAttribute('data-tab', tab);
+        links.forEach(a => a.dataset.tab === tab ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+      };
+      const jump = (y) => {  // instant, ignoring the CSS smooth scrolling
+        root.style.scrollBehavior = 'auto';
+        window.scrollTo(0, Math.max(0, y));
+        root.style.scrollBehavior = '';
+      };
+      const open = (id) => {
+        const tab = tabFor(id);
+        show(tab);
+        const panel = panels.find(p => p.dataset.tab === tab);
+        if (id === tab) {
+          // Opening a tab: go to the top of its content (on phones the profile card sits above it)
+          jump(tab === 'about' ? 0 : main.getBoundingClientRect().top + window.scrollY - topbar.offsetHeight - 12);
+          const h = panel.querySelector('h2');
+          h.setAttribute('tabindex', '-1');
+          h.focus({ preventScroll: true });
+        } else {
+          document.getElementById(id).scrollIntoView({ block: 'start' });
+        }
+      };
+      document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[href^="#"]');
+        if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const id = decodeURIComponent(a.getAttribute('href').slice(1));
+        const target = id && document.getElementById(id);
+        if (!target || !target.closest('.panel')) return;
+        e.preventDefault();
+        if (hashId() !== id) history.pushState(null, '', '#' + id);
+        open(id);
+      });
+      window.addEventListener('popstate', () => show(tabFor(hashId())));
+      show(tabFor(hashId()));
+    })();
 
     // News: show the latest NEWS_LIMIT items, expand on click (keep in sync with nth-child(n+6) in the CSS)
     (function(){
@@ -531,9 +666,8 @@
     })();
 
     // Copy email
-    const copyBtn = document.getElementById('copyBtn');
     const copyLabel = document.getElementById('copyLabel');
-    copyBtn.addEventListener('click', async () => {
+    document.getElementById('copyBtn').addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText('v.do@deakin.edu.au');
         copyLabel.textContent = 'Copied!';
@@ -542,27 +676,6 @@
       }
       setTimeout(() => copyLabel.textContent = 'Copy email address', 1600);
     });
-
-    // Highlight the top-bar link for the section currently in view
-    (function(){
-      const links = Array.from(document.querySelectorAll('.toplink'));
-      const sections = links.map(a => document.getElementById(a.dataset.section)).filter(Boolean);
-      const setActive = (id) => links.forEach(a => a.classList.toggle('active', a.dataset.section === id));
-      let ticking = false;
-      const update = () => {
-        ticking = false;
-        const probe = window.innerHeight * 0.3;
-        let current = sections[0].id;
-        for (const s of sections) if (s.getBoundingClientRect().top <= probe) current = s.id;
-        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-        if (atBottom) current = sections[sections.length - 1].id;
-        setActive(current);
-      };
-      const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
-      update();
-    })();
   </script>
 
   <!-- Structured data -->

@@ -23,7 +23,7 @@
       d.classList.add('js');
       try { t = localStorage.getItem('theme-pref-vdd') || 'light'; } catch(e){}
       if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
-      var tabs = ['about', 'publications', 'grants', 'service', 'contact'];  // keep in sync with the .panel elements
+      var tabs = ['about', 'publications', 'readings', 'grants', 'service', 'contact'];  // keep in sync with the .panel elements
       var h = location.hash.slice(1);
       d.setAttribute('data-tab', tabs.indexOf(h) > 0 ? h : 'about');
     })();
@@ -94,6 +94,7 @@
     /* Active tab (driven by data-tab on <html>, so it is right before any script runs) */
     :root[data-tab="about"]        .toplink[data-tab="about"],
     :root[data-tab="publications"] .toplink[data-tab="publications"],
+    :root[data-tab="readings"]     .toplink[data-tab="readings"],
     :root[data-tab="grants"]       .toplink[data-tab="grants"],
     :root[data-tab="service"]      .toplink[data-tab="service"],
     :root[data-tab="contact"]      .toplink[data-tab="contact"]{color:var(--accent-ink); background:var(--accent-soft)}
@@ -125,6 +126,7 @@
     .js .panel{height:0; overflow:hidden; visibility:hidden; margin-top:0}
     :root[data-tab="about"]        #tab-about,
     :root[data-tab="publications"] #tab-publications,
+    :root[data-tab="readings"]     #tab-readings,
     :root[data-tab="grants"]       #tab-grants,
     :root[data-tab="service"]      #tab-service,
     :root[data-tab="contact"]      #tab-contact{height:auto; overflow:visible; visibility:visible}
@@ -236,6 +238,7 @@
       <nav class="topnav">
         <a class="toplink" href="#about"        data-tab="about">About</a>
         <a class="toplink" href="#publications" data-tab="publications">Publications</a>
+        <a class="toplink" href="#readings"     data-tab="readings">Readings</a>
         <a class="toplink" href="#grants"       data-tab="grants">Grants</a>
         <a class="toplink" href="#service"      data-tab="service">Service</a>
         <a class="toplink" href="#contact"      data-tab="contact">Contact</a>
@@ -322,6 +325,10 @@
         <section id="news" aria-labelledby="news-title">
           <h2 id="news-title">News</h2>
           <div class="list" id="newsList">
+            <div class="item">
+              <time datetime="2026-10">Oct 2026</time>
+              <div>📖 New reading: <a href="readings/latent-space-ai-safety-2025-2026/">Latent-space AI safety, January 2025 to October 2026</a>, a literature review of about 300 papers with every entry tagged by acceptance status</div>
+            </div>
             <div class="item">
               <time datetime="2026-10">Oct 2026</time>
               <div>💰 I received a grant from Lambda's Research Grant Program</div>
@@ -504,6 +511,25 @@
                 <div class="authors">Nguyen Tien Hoa, <span class="me">Van Dai Do</span>, Le Hoang Lan, Nguyen Cong Luong, Duc Van Le, Dusit Niyato — <a href="https://ieeexplore.ieee.org/abstract/document/10174680" target="_blank" rel="noopener">Link</a></div>
               </div>
               <time datetime="2023">2023</time>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== Tab: Readings ===== -->
+      <!-- One .item per piece, newest first. Each reading lives in its own folder under readings/ -->
+      <div class="panel" id="tab-readings" data-tab="readings">
+        <section id="readings" aria-labelledby="readings-title">
+          <h2 id="readings-title">Readings</h2>
+          <p class="lead muted" style="margin-bottom:16px">Literature reviews and long-form notes on what I am reading.</p>
+          <div class="list" id="readingsList">
+            <div class="item pub">
+              <span class="venue top">Review</span>
+              <div>
+                <strong><a href="readings/latent-space-ai-safety-2025-2026/">Latent-space AI safety, January 2025 to October 2026</a></strong>
+                <div class="authors">What changed, what held up under evaluation, and what is still open: activation steering, latent attacks and defenses, white-box monitoring, latent reasoning, agents and vision-language models. About 300 papers, each tagged by venue and acceptance status.</div>
+              </div>
+              <time datetime="2026-10">Oct 2026</time>
             </div>
           </div>
         </section>

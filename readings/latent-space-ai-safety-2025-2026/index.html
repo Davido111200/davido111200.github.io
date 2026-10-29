@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Latent-space AI safety, January 2025 to October 2026 — Van Dai Do</title>
+  <meta name="description" content="A literature review of latent-space AI safety from January 2025 to October 2026: steering, latent attacks and defenses, white-box monitoring, latent reasoning, agents and vision-language models, with every paper tagged by venue and acceptance status." />
+  <meta property="og:title" content="Latent-space AI safety, January 2025 to October 2026" />
+  <meta property="og:description" content="What changed, what held up under evaluation, and what is still open, read from the peer-reviewed record. About 300 papers, each tagged by acceptance status." />
+  <meta property="og:type" content="article" />
+  <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="../../assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../../assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="../../assets/icons/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <script>
+    // Same saved theme as the home page, applied before first paint
+    (function(){
+      var d = document.documentElement, t = 'light';
+      try { t = localStorage.getItem('theme-pref-vdd') || 'light'; } catch(e){}
+      if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    /* ===== Design tokens (shared with the home page) ===== */
+    :root{
+      --bg:#f5f6f8; --surface:#ffffff; --surface-2:#f0f2f5; --text:#14181f; --muted:#5d6675; --border:#e2e5ea;
+      --accent:#1d5bd8; --accent-soft:#e8eefc; --accent-ink:#1a4bb0; --on-accent:#ffffff;
+      --gold-soft:#fbf1d5; --gold-ink:#875700;
+      --red-soft:#fbe3e3; --red-ink:#9b2c2c; --violet-soft:#ebe8f9; --violet-ink:#4f47a8;
+      --shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
+      --radius:14px; --maxw:1120px; --topbar-h:56px;
+      --sans:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme:light;
+    }
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]){
+        --bg:#0e1116; --surface:#161a21; --surface-2:#1e232c; --text:#e6e8ec; --muted:#9aa3b0; --border:#272d38;
+        --accent:#7eaaff; --accent-soft:rgba(126,170,255,.14); --accent-ink:#a8c5ff; --on-accent:#0b1220;
+        --gold-soft:rgba(245,196,81,.14); --gold-ink:#f2c45a; --red-soft:rgba(240,128,128,.14); --red-ink:#f29090;
+        --violet-soft:rgba(160,150,240,.16); --violet-ink:#b8b4f0; --shadow:none; color-scheme:dark;
+      }
+    }
+    :root[data-theme="dark"]{
+      --bg:#0e1116; --surface:#161a21; --surface-2:#1e232c; --text:#e6e8ec; --muted:#9aa3b0; --border:#272d38;
+      --accent:#7eaaff; --accent-soft:rgba(126,170,255,.14); --accent-ink:#a8c5ff; --on-accent:#0b1220;
+      --gold-soft:rgba(245,196,81,.14); --gold-ink:#f2c45a; --red-soft:rgba(240,128,128,.14); --red-ink:#f29090;
+      --violet-soft:rgba(160,150,240,.16); --violet-ink:#b8b4f0; --shadow:none; color-scheme:dark;
+    }
+    @media (prefers-reduced-motion: reduce){ *{transition-duration:.001ms!important; scroll-behavior:auto!important} }
+
+    /* ===== Base ===== */
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0; background:var(--bg); color:var(--text); font:17px/1.65 var(--sans); -webkit-font-smoothing:antialiased}
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline; text-underline-offset:2px}
+    :where(a,button,summary):focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
+    p{margin:0 0 16px; max-width:70ch}
+
+    /* ===== Top bar (same as the home page) ===== */
+    .topbar{position:sticky; top:0; z-index:10; height:var(--topbar-h); background:var(--surface); border-bottom:1px solid var(--border)}
+    .topbar-inner{max-width:var(--maxw); height:100%; margin:0 auto; padding:0 24px; display:flex; align-items:center; gap:16px}
+    .topbrand{font-weight:700; color:var(--text); white-space:nowrap}
+    .topbrand:hover{text-decoration:none}
+    .topnav{margin-left:auto; display:flex; gap:2px; overflow-x:auto; scrollbar-width:none}
+    .topnav::-webkit-scrollbar{display:none}
+    .toplink{padding:.35rem .7rem; border-radius:8px; color:var(--muted); font-size:.93rem; white-space:nowrap}
+    .toplink:hover{color:var(--text); background:var(--surface-2); text-decoration:none}
+    .toplink[aria-current="page"]{color:var(--accent-ink); background:var(--accent-soft)}
+    .toggle{display:inline-flex; align-items:center; gap:6px; flex-shrink:0; padding:.3rem .7rem; border:1px solid var(--border); border-radius:999px; background:transparent; color:var(--muted); font:inherit; font-size:.85rem; cursor:pointer}
+    .toggle:hover{color:var(--text); background:var(--surface-2)}
+    .toggle svg{width:16px; height:16px}
+
+    /* ===== Layout: contents rail + article card ===== */
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:28px 24px 48px}
+    .page{display:grid; grid-template-columns:minmax(0,1fr); gap:24px; align-items:start}
+    @media (min-width:1000px){ .page{grid-template-columns:220px minmax(0,1fr)} }
+    main{min-width:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:36px 44px 44px}
+    .rail{display:none}
+    @media (min-width:1000px){
+      .rail{display:block; position:sticky; top:calc(var(--topbar-h) + 28px); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 16px}
+      .rail h5{margin:0 0 8px; font:600 .72rem/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+      .rail a{display:block; font-size:.88rem; line-height:1.35; color:var(--muted); padding:5px 0 5px 10px; border-left:2px solid var(--border)}
+      .rail a:hover{color:var(--text); text-decoration:none}
+      .rail a.current{color:var(--accent-ink); border-left-color:var(--accent)}
+    }
+    .toc{margin:22px 0 0; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); padding:10px 16px}
+    .toc summary{cursor:pointer; font-weight:600; font-size:.95rem}
+    .toc ol{margin:10px 0 4px; padding-left:1.3em; font-size:.93rem; line-height:1.6}
+    @media (min-width:1000px){ .toc{display:none} }
+
+    /* ===== Header ===== */
+    header.hero{padding-top:4px}
+    .eyebrow{font:600 .72rem/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); margin:0 0 14px}
+    h1{font-size:clamp(28px, 4.2vw, 40px); line-height:1.15; letter-spacing:-.01em; margin:0 0 14px; text-wrap:balance; max-width:22ch}
+    .dek{font-size:1.15rem; line-height:1.5; color:var(--muted); margin:0 0 18px; max-width:36em; text-wrap:balance}
+    .byline{font-size:.93rem; color:var(--muted); margin:0}
+    .byline b{color:var(--text); font-weight:600}
+    .facts{display:flex; flex-wrap:wrap; gap:8px 26px; margin:20px 0 0; padding:14px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); font-size:.88rem; color:var(--muted)}
+    .facts b{color:var(--text); font-weight:600; font-variant-numeric:tabular-nums}
+
+    /* ===== Sections ===== */
+    section{padding-top:44px; scroll-margin-top:calc(var(--topbar-h) + 16px)}
+    h2{font-size:1.45rem; line-height:1.25; margin:0 0 14px; display:flex; align-items:flex-start; gap:10px; text-wrap:balance}
+    h2::before{content:""; flex:0 0 4px; width:4px; height:1.1em; margin-top:.15em; border-radius:2px; background:var(--accent)}
+    h3{font-size:1.12rem; line-height:1.3; margin:26px 0 8px}
+    .lede{font-size:1.08rem; line-height:1.5; max-width:62ch}
+    .intro{font-size:1.08rem; line-height:1.55}
+    ul.plain{padding-left:1.2em; margin:0 0 16px; max-width:70ch}
+    ul.plain li{margin-bottom:8px}
+    .kicker{font:600 .72rem/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 10px}
+
+    /* Status chips, in the home page's venue-tag style */
+    .tag{display:inline-block; font:600 .68rem/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; padding:.28rem .45rem .22rem; border-radius:6px; vertical-align:1px; white-space:nowrap}
+    .ok{color:var(--accent-ink); background:var(--accent-soft)}
+    .ws{color:var(--gold-ink); background:var(--gold-soft)}
+    .pre{color:var(--muted); background:var(--surface-2); border:1px solid var(--border)}
+    .rej{color:var(--red-ink); background:var(--red-soft)}
+    .unv{color:var(--violet-ink); background:var(--violet-soft)}
+    .legend{display:grid; grid-template-columns:1fr; gap:10px 24px; margin:14px 0 0; padding:16px 18px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; font-size:.95rem; line-height:1.45}
+    @media (min-width:700px){ .legend{grid-template-columns:1fr 1fr} }
+    .legend div{display:flex; gap:10px; align-items:flex-start}
+    .legend .tag{margin-top:3px; flex:none}
+    .legend p{margin:0; max-width:none; font-size:.95rem}
+
+    .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:16px 18px; font-size:.95rem; line-height:1.5; margin:18px 0}
+    .note p{max-width:none; margin:0 0 10px}
+    .note p:last-child{margin:0}
+
+    /* Stage map */
+    .map{display:grid; grid-template-columns:1fr; gap:10px; margin:16px 0 6px}
+    @media (min-width:880px){ .map{grid-template-columns:repeat(5, minmax(0,1fr)); gap:14px} }
+    .stage{position:relative; min-width:0; background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--accent); border-radius:10px; padding:12px}
+    .stage h4{margin:0 0 6px; font:600 .72rem/1.25 var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--text)}
+    .stage p{margin:0 0 10px; font-size:.88rem; line-height:1.45; color:var(--muted); max-width:none}
+    .stage ul{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:5px}
+    .stage li{font-size:.74rem; font-weight:600; line-height:1; padding:5px 8px; background:var(--accent-soft); color:var(--accent-ink); border-radius:999px}
+    @media (min-width:880px){ .stage:not(:last-child)::after{content:""; position:absolute; right:-11px; top:22px; border:6px solid transparent; border-left:7px solid var(--border)} }
+
+    /* Six shifts */
+    .shifts{list-style:none; padding:0; margin:20px 0 0; display:grid; grid-template-columns:1fr; gap:22px 32px}
+    @media (min-width:760px){ .shifts{grid-template-columns:1fr 1fr} }
+    .shifts li{border-top:1px solid var(--border); padding-top:12px; min-width:0}
+    .shifts h3{margin:0 0 8px; font-size:1.05rem; line-height:1.3}
+    .shifts p{margin:0; font-size:.95rem; line-height:1.55; max-width:none}
+
+    /* Tables */
+    .tablewrap{overflow-x:auto; margin:20px 0 10px; border-top:1px solid var(--text)}
+    table{border-collapse:collapse; width:100%; font-size:.9rem; line-height:1.4; min-width:620px}
+    caption{text-align:left; font:600 .7rem/1.3 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:10px 0 8px}
+    th{text-align:left; font-weight:600; font-size:.8rem; color:var(--muted); padding:8px 12px 8px 0; border-bottom:1px solid var(--border)}
+    td{padding:9px 12px 9px 0; border-bottom:1px solid var(--border); vertical-align:top}
+    td:first-child{font-weight:600}
+    td:nth-child(2){white-space:nowrap}
+    td:last-child, th:last-child{padding-right:0}
+
+    dl.dis{margin:0 0 16px; max-width:70ch}
+    dl.dis dt{font-weight:600; margin:14px 0 4px}
+    dl.dis dd{margin:0; font-size:.98rem; line-height:1.55}
+
+    .gaps{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:16px}
+    .gaps li{border-left:3px solid var(--accent); padding:2px 0 2px 16px; max-width:72ch}
+    .gaps h3{margin:0 0 6px; font-size:1.05rem}
+    .gaps p{margin:0; font-size:.98rem; line-height:1.55; max-width:none}
+
+    details.refs{border-top:1px solid var(--border); padding:12px 0}
+    details.refs:last-of-type{border-bottom:1px solid var(--border)}
+    details.refs summary{cursor:pointer; font-weight:600; font-size:1.02rem; line-height:1.4}
+    details.refs summary small{font-size:.82rem; font-weight:400; color:var(--muted); margin-left:8px}
+    .refs ol{font-size:.88rem; line-height:1.5; padding-left:1.6em; margin:12px 0 4px}
+    .refs li{margin:0 0 7px}
+    .refs .id{font-family:var(--mono); font-size:.8rem}
+    footer{margin-top:48px; padding-top:18px; border-top:1px solid var(--border); font-size:.88rem; line-height:1.55; color:var(--muted)}
+    footer p{max-width:none; margin:0 0 6px}
+
+    @media (max-width:900px){
+      .wrap{padding:20px 16px 32px}
+      main{padding:24px 20px 28px}
+    }
+    @media (max-width:640px){
+      .topbar-inner{padding:0 12px; gap:8px}
+      .topbrand{display:none}
+      .topnav{margin-left:0; flex:1; min-width:0; gap:0}
+      .toplink{padding:.35rem .4rem; font-size:.85rem}
+      .toggle{padding:.3rem .4rem}
+      #themeLabel{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar" role="navigation" aria-label="Site sections">
+    <div class="topbar-inner">
+      <a class="topbrand" href="../../">Van Dai Do</a>
+      <nav class="topnav">
+        <a class="toplink" href="../../#about">About</a>
+        <a class="toplink" href="../../#publications">Publications</a>
+        <a class="toplink" href="../../#readings" aria-current="page">Readings</a>
+        <a class="toplink" href="../../#contact">Contact</a>
+      </nav>
+      <button id="themeBtn" class="toggle" type="button" aria-label="Toggle colour theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4 12H2m20 0h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M5 19l1.5-1.5"/></svg>
+        <span id="themeLabel">Light</span>
+      </button>
+    </div>
+  </div>
+
+<div class="wrap">
+<div class="page">
+<aside class="rail" aria-label="Contents">
+  <h5>Contents</h5>
+  <nav id="railnav">
+    <a href="#map">Where each line acts</a>
+    <a href="#shifts">Six shifts</a>
+    <a href="#scope">Verification scope</a>
+    <a href="#steering">Steering</a>
+    <a href="#attacks">Attacks and defenses</a>
+    <a href="#probes">Monitoring and probes</a>
+    <a href="#reasoning">Latent reasoning</a>
+    <a href="#agents">Agents and memory</a>
+    <a href="#vlm">Vision-language models</a>
+    <a href="#trends">Trends and disagreements</a>
+    <a href="#open">Open problems</a>
+    <a href="#gaps">Where the record stops</a>
+    <a href="#refs">References</a>
+  </nav>
+</aside>
+
+<main>
+<header class="hero">
+  <p class="eyebrow">Literature review</p>
+  <h1>Latent-space AI safety, January 2025 to October 2026</h1>
+  <p class="dek">What changed, what held up under evaluation, and what is still open, read from the peer-reviewed record with preprints and lab reports marked as such.</p>
+  <p class="byline"><b>Van Dai Do</b> · Deakin University · October 2026</p>
+  <div class="facts">
+    <span><b>About 300</b> papers located</span>
+    <span><b>Six</b> sub-areas</span>
+    <span><b>2024</b> work as background only</span>
+    <span>Acceptance tags verified as of <b>27 Oct 2026</b></span>
+  </div>
+  <details class="toc">
+    <summary>Contents</summary>
+    <ol>
+      <li><a href="#map">Where each line of work acts</a></li>
+      <li><a href="#shifts">Six shifts that define the period</a></li>
+      <li><a href="#scope">Verification scope</a></li>
+      <li><a href="#steering">Steering and representation engineering</a></li>
+      <li><a href="#attacks">Latent attacks and training-time defenses</a></li>
+      <li><a href="#probes">White-box monitoring and probes</a></li>
+      <li><a href="#reasoning">Latent reasoning and monitorability</a></li>
+      <li><a href="#agents">Agents, multi-agent systems and memory</a></li>
+      <li><a href="#vlm">Vision-language models</a></li>
+      <li><a href="#trends">Cross-cutting trends and disagreements</a></li>
+      <li><a href="#open">Open problems the papers state</a></li>
+      <li><a href="#gaps">Where the accepted record stops</a></li>
+      <li><a href="#refs">References</a></li>
+    </ol>
+  </details>
+</header>
+
+<section id="summary" style="padding-top:36px">
+  <p class="intro">Latent-space control and latent-space monitoring both matured enough to deploy in this period, and both turned out to be shared primitives rather than a defender's advantage. The strongest peer-reviewed claims of 2025 to 2026 come from evaluation papers, not from new methods. Every major 2024 latent defense was re-evaluated and found less durable than first reported. Benign or random steering vectors move jailbreak success by tens of points. Refusal is mediated by several directions rather than one. No activation-steering method yet beats a prompting baseline on the joint efficacy and side-effect frontier. In the same window, activation probes went into production at two frontier labs at a small fraction of the cost of an LLM classifier, and probes on action activations now rival or beat frontier text monitors on sabotage benchmarks, though that last result is still under review.</p>
+  <p class="intro">For agents, multi-agent systems and agent memory, the accepted record largely stops: no main-track paper applies activation steering to a standard agentic safety benchmark and reports a win over prompt-level defenses, no located paper applies a latent defense to decomposition or distributed attacks, and no located paper probes or steers what an agent writes to or retrieves from memory.</p>
+
+  <p class="kicker">How papers are tagged</p>
+  <div class="legend">
+    <div><span class="tag ok">accepted</span><p>Main track at a peer-reviewed venue, verified on a proceedings page, PMLR, the ACL Anthology, a conference site or an OpenReview venue field. In running text, a bare venue in parentheses means this.</p></div>
+    <div><span class="tag ws">workshop</span><p>Workshop paper only. Where the main-track submission was rejected, the text says so.</p></div>
+    <div><span class="tag pre">preprint</span><p>arXiv preprint, lab blog post or technical report. Not peer-reviewed, however influential.</p></div>
+    <div><span class="tag rej">rejected</span><p>Rejected, withdrawn or desk-rejected at the venue named. A review signal, not a quality verdict.</p></div>
+    <div><span class="tag unv">unverified</span><p>Listed by a venue but main-track status could not be confirmed, or the notes disagree about it.</p></div>
+  </div>
+</section>
+
+<section id="map">
+  <h2>Where each line of work acts</h2>
+  <p>Latent-space safety is six literatures that touch different parts of one forward pass. The stages below follow the forward pass through a transformer, and each stage lists the lines of work that intervene or read there.</p>
+  <div class="map">
+    <div class="stage"><h4>Weights</h4><p>Training-time defenses and fine-tuning attacks change the parameters themselves.</p><ul><li>Attacks and defenses</li><li>Unlearning</li></ul></div>
+    <div class="stage"><h4>Input embeddings</h4><p>Embedding-space jailbreaks, image tokens entering the stream, and instruction-versus-data separation.</p><ul><li>Attacks</li><li>Vision-language</li><li>Agents</li></ul></div>
+    <div class="stage"><h4>Residual stream</h4><p>Steering vectors add or ablate directions; probes and SAEs read the same activations.</p><ul><li>Steering</li><li>Monitoring</li><li>Vision-language</li></ul></div>
+    <div class="stage"><h4>Reasoning state</h4><p>Continuous thoughts and shared KV caches replace readable text between steps or between agents.</p><ul><li>Latent reasoning</li><li>Multi-agent</li></ul></div>
+    <div class="stage"><h4>Outputs and actions</h4><p>Text monitors, action probes, tool calls and memory writes, where latent methods are compared with output-level ones.</p><ul><li>Agents</li><li>Monitoring</li></ul></div>
+  </div>
+</section>
+
+<section id="shifts">
+  <h2>Six shifts that define the period</h2>
+  <ul class="shifts">
+    <li>
+      <h3>Refusal stopped being one direction</h3>
+      <p>Wollschläger et al. (ICML 2025) found multiple independent refusal directions and refusal cones of dimension up to five, and showed that orthogonal directions need not be independent under intervention. Harmful-refusal directions look task-agnostic while over-refusal directions are task-dependent and higher-dimensional. Attacks that ablate the refusal direction and defenses that protect it both rest on a premise the accepted literature has complicated.</p>
+    </li>
+    <li>
+      <h3>Steering became learned, gated and audited</h3>
+      <p>The 2026 accepted record favours principled formulations: null-space constraints (AlphaSteer, ICLR 2026), feedback control (PID Steering, ICLR 2026), optimal transport between activation clusters (CHaRS, ICML 2026) and joint training of directions and strengths (PrOSV, ICML 2026). Beside them sits a safety audit: Li et al. (Findings of ACL 2026) show that steering vectors for nine unrelated traits shift jailbreak success by up to +57 or -50 points, with cosine against the refusal direction explaining most of the variance.</p>
+    </li>
+    <li>
+      <h3>Every 2024 latent defense was re-evaluated downward</h3>
+      <p>Qi et al. (ICLR 2025) broke tamper-resistant safeguards by changing the optimizer schedule or using LoRA, and recovered RepNoise's refusal with 100 benign examples. Che et al. (TMLR 2025) found eight capability-removal methods recover more than 30 points of WMDP-Bio within sixteen gradient steps. Bailey et al. (ICLR 2026) drove probe recall from 100% to 0% at a 90% jailbreak rate and left circuit-breaker models jailbreakable. The one approach that held through 10,000 adversarial fine-tuning steps is pretraining-data filtering (O'Brien et al., ICLR 2026).</p>
+    </li>
+    <li>
+      <h3>Probes went to production; aggregation is the one robust lesson</h3>
+      <p>Anthropic and Google DeepMind report activation classifiers in deployment at roughly 40x and 10,000x lower cost than LLM classifiers <span class="tag pre">preprint</span>. The accepted result underneath is McKenzie et al. (NeurIPS 2025): attention and softmax probes generalize best out of distribution, last-token probes worst, and probes belong in a cascade with an LLM judge. Deception probes moved from AUROC 0.96 to 0.999 (Goldowsky-Dill et al., ICML 2025) to caution, as follow-ups found they confound instructed deception with intent.</p>
+    </li>
+    <li>
+      <h3>Monitorability became a measured quantity</h3>
+      <p>Guan et al. (ICML 2026) ran thirteen evaluations over twenty-four environments: chain-of-thought monitors beat action-only monitors, and reinforcement learning at current scale does not materially reduce monitorability. Dilgren and Wiegreffe (COLM 2026) found latent reasoning models rarely need their latent tokens, and when they do, 65 to 93% of gold traces are decodable. Boppana et al. (ICML 2026) found final answers decodable from activations well before the chain of thought reveals them, so part of the opacity problem already sits inside explicit-CoT models.</p>
+    </li>
+    <li>
+      <h3>Agentic latent safety opened with almost nothing accepted</h3>
+      <p>Latent inter-agent communication reached top venues on efficiency grounds with no safety analysis: Cache-to-Cache and KVComm (ICLR 2026), LatentMAS (ICML 2026 spotlight), Thought Communication (NeurIPS 2025 spotlight), Interlat (ACL 2026). The safety response arrived a year later as preprints reporting that benignly trained latent links raise harmful compliance from about 4% to about 31%. No accepted paper applies an activation-based defense on AgentHarm, AgentDojo or InjecAgent.</p>
+    </li>
+  </ul>
+</section>
+
+<section id="scope">
+  <h2>Verification scope</h2>
+  <div class="note">
+    <p>Acceptance tags are only as good as the venue lists that could be reached. ICLR 2025 and 2026, NeurIPS 2025, ICML 2025 (PMLR v267) and ICML 2026 (PMLR v306) were checkable throughout, as were the ACL Anthology (ACL, Findings, EMNLP, NAACL and EACL, 2025 to 2026), AAAI 2025 and 2026, TMLR, CVPR 2025, ACML 2025, SaTML 2025 and NDSS 2026.</p>
+    <p>Three gaps matter. <b>NeurIPS 2026</b> main-track status could not be established for any paper, since the conference is in December 2026; items tagged NeurIPS 2026 are posters listed on the conference site or confirmed workshop papers. <b>COLM</b> lists were weakly verified, so COLM tags rest on OpenReview venue fields or a paper's own header. <b>Security venues</b> (IEEE S&amp;P, USENIX Security, CCS) were not systematically checkable; NDSS 2026 is the one confirmed security venue. No citation counts were retrievable, so nothing here claims which paper is most cited.</p>
+  </div>
+</section>
+
+<section id="steering">
+  <h2>Steering and representation engineering</h2>
+  <p class="lede"><strong>Steering moved from extraction heuristics to constrained control, and acquired a documented safety bill.</strong></p>
+  <p>The 2024 picture, a single refusal direction at one layer with a fixed difference-in-means vector, has been replaced along four axes. Geometrically, Wollschläger et al. (ICML 2025) introduced gradient-based refusal-direction and refusal-cone optimization and found cones up to dimension five across three model families, with a KL retain loss recovering much of the capability lost to directional ablation. On generalization, Wang et al. (NeurIPS 2025) built a fourteen-language refusal benchmark and found an English-extracted refusal vector bypasses refusals in the other languages nearly perfectly, identifying near-parallel refusal vectors as the mechanism behind cross-lingual jailbreaks.</p>
+  <p>Persona-level control is where frontier-lab work concentrated and where the acceptance record splits. OpenAI's persona-features paper (Wang et al., ICLR 2026) used sparse-autoencoder model diffing on GPT-4o to surface a toxic-persona latent whose activation discriminates aligned from misaligned fine-tunes and rises before behavioural misalignment appears; a few hundred benign samples restore alignment. Anthropic's persona vectors (Chen et al.) remain a preprint <span class="tag pre">preprint</span>, with one record of an ICLR 2026 rejection; they report that fine-tuning-induced activation shift predicts trait expression and that preventative steering during training preserves capability better than post-hoc subtraction. The Assistant Axis (Lu et al.) carries conflicting tags <span class="tag unv">unverified</span>; its claim is that activation capping, which acts only when the persona drifts past a bound, cuts harmful responses to persona jailbreaks by nearly 60% at flat capability.</p>
+  <p>Sparse-autoencoder steering did not survive benchmarking. AxBench (Wu et al., ICML 2025) found prompting best for steering and difference-in-means best for concept detection, with SAEs competitive on neither. The safety bill is now documented at accepted venues: SteerMoE (ICLR 2026) reports unsafe expert steering cutting safety by up to 41% alone and up to 100% combined with jailbreaks; PERSONA (ICLR 2026) finds some traits raise jailbreak success while others lower it; The Rogue Scalpel <span class="tag ws">workshop</span>, rejected from the ICLR 2026 main track, reports random directions jailbreaking from a zero baseline, with 817 of 1,000 benign SAE features jailbreaking at least one prompt, and attributes the effect to interference with non-linear safety structure rather than refusal-direction suppression. Two groups propose subtracting a separable safety-cost component as the fix: Li and Kasneci <span class="tag ws">workshop</span> isolate one direction whose ablation restores safety, and Azizi et al. (NeurIPS 2026 poster <span class="tag unv">unverified</span>) remove a sharp component of the steering vector.</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Accepted core and the key non-archival items</caption>
+      <thead><tr><th>Paper</th><th>Venue</th><th>Status</th><th>Contribution</th></tr></thead>
+      <tbody>
+        <tr><td>Wollschläger et al., Geometry of Refusal</td><td>ICML 2025</td><td><span class="tag ok">accepted</span></td><td>Multiple independent refusal directions; cones up to dimension five</td></tr>
+        <tr><td>Wu et al., AxBench</td><td>ICML 2025</td><td><span class="tag ok">accepted</span></td><td>Prompting beats steering; difference-in-means beats SAEs</td></tr>
+        <tr><td>Wang et al., Refusal Direction is Universal</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>One language's refusal vector transfers across fourteen languages</td></tr>
+        <tr><td>Vu and Nguyen, Angular Steering</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Rotation in a fixed 2D subspace for continuous refusal control</td></tr>
+        <tr><td>Sheng et al., AlphaSteer</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Null-space constraint keeps the vector near zero on benign prompts</td></tr>
+        <tr><td>Nguyen et al., PID Steering</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Steering as proportional control with integral and derivative terms</td></tr>
+        <tr><td>Wang et al., Persona Features Control Emergent Misalignment</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Toxic-persona SAE latent flags misaligned fine-tunes before behaviour changes</td></tr>
+        <tr><td>Fayyaz et al., SteerMoE</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Expert (de)activation; unsafe steering cuts safety up to 100% with jailbreaks</td></tr>
+        <tr><td>Park et al., ASGuard</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Channel-wise scaling of jailbreak-relevant attention heads in preventative fine-tuning</td></tr>
+        <tr><td>Abdullaev et al., CHaRS</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>Steering as optimal transport between activation clusters</td></tr>
+        <tr><td>Adila et al., Weight Updates as Activation Shifts</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>First-order equivalence between activation interventions and weight updates</td></tr>
+        <tr><td>Li et al., Safety Pitfalls of Steering Vectors</td><td>Findings of ACL 2026</td><td><span class="tag ok">accepted</span></td><td>Unrelated trait vectors shift jailbreak success by up to +57 or -50 points</td></tr>
+        <tr><td>Korznikov et al., The Rogue Scalpel</td><td>ICLR 2026 workshop</td><td><span class="tag ws">workshop</span></td><td>Random and benign SAE directions jailbreak; main track rejected</td></tr>
+        <tr><td>Chen et al., Persona Vectors</td><td>arXiv</td><td><span class="tag pre">preprint</span></td><td>Activation shift predicts trait expression; preventative steering in training</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="attacks">
+  <h2>Latent attacks and training-time defenses</h2>
+  <p class="lede"><strong>Every 2024 latent defense was re-evaluated and found less durable than claimed, and evaluation protocol became the contribution.</strong></p>
+  <p>Bailey et al. (ICLR 2026) defeated mean-difference, logistic-regression and MLP probes, Gaussian, Mahalanobis and VAE latent detectors, SAE monitors and two backdoor detectors, and found circuit-breaker models jailbreakable at 95% with a universal embedding-space suffix; across more than seventy rounds of probe adversarial training the attacker kept finding new evasions. Łucki et al. (TMLR 2025) recovered hazardous capability from RMU with ten unrelated fine-tuning examples, by removing directions in activation space, by pruning a small fraction of weights and by a logit-lens readout, concluding that current unlearning obscures rather than removes. Tamper-resistant safeguards should be read as confounded rather than refuted: TAR was the one method in Che et al. (TMLR 2025) where only one of nine attacks exceeded a ten-point gain, but Qi et al. (ICLR 2025) record GSM8K falling from 74.4 to 1.5, and a COLM 2025 workshop paper argues the apparent robustness partly reflects degraded capability. Circuit breakers have no accepted 2025 to 2026 paper dedicated to breaking them, which is a gap in the peer-reviewed record.</p>
+  <p>New attack classes multiplied with a poor acceptance record. Gu et al. (ACL 2026) introduce an activation-steering attack with a supervision-free sensitivity probe and find the most vulnerable layer moves after robustness training. NeuroStrike (Wu et al., NDSS 2026) prunes under 0.6% of neurons in targeted layers for 76.9% average attack success across more than twenty open-weight models. Chen et al. (ICML 2026) refine steering vectors with judge feedback and per-layer strength, raising average harmfulness from 6% to about 70% across twelve fortified models. Against that, LatentBreak, MSE-Break, In-Context Representation Hijacking, Neural Chameleons and The Rogue Scalpel were all withdrawn, rejected or desk-rejected at ICLR 2026 <span class="tag rej">rejected</span>.</p>
+  <p>Defenses moved to training time in four accepted lines: representation-space adversarial training and regularization (ReFAT, ICLR 2025; RepBend, ACL 2025; DeepRefusal, Findings of EMNLP 2025; DOOR, ICML 2025), deepening alignment past the first output tokens (Qi et al., ICLR 2025 oral; DeRTa, ACL 2025; Any-Depth Alignment, ICLR 2026), subspace- and component-constrained fine-tuning (safety layers and safety neurons, ICLR 2025; GuardSpace, ICLR 2026) and anti-fine-tuning designs (SEAM, ICLR 2026; Self-Destruct Trapdoor, EACL 2026; AntiDote, AAAI 2026). One accepted result pulls against the whole programme: Ponkshe et al. (ICLR 2026) find that subspaces strengthening safe behaviour also strengthen useful behaviour, so subspace-isolation defenses face fundamental limits, a live contradiction with GuardSpace inside one proceedings. On unlearning, the methods reporting real robustness gains all change the optimization geometry rather than the location of representations: distillation into a noised student (UNDO, NeurIPS 2025 spotlight), sharpness-aware minimization (ICML 2025), dual-space smoothness (PRISM, ICLR 2026) and optimizer downgrade (ICLR 2026).</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Accepted core</caption>
+      <thead><tr><th>Paper</th><th>Venue</th><th>Status</th><th>Contribution</th></tr></thead>
+      <tbody>
+        <tr><td>Qi et al., Durability of Safeguards</td><td>ICLR 2025</td><td><span class="tag ok">accepted</span></td><td>Seeds, schedule, LoRA and prompt template break RepNoise and TAR claims</td></tr>
+        <tr><td>Qi et al., Safety Alignment More Than a Few Tokens Deep</td><td>ICLR 2025 oral</td><td><span class="tag ok">accepted</span></td><td>Shallow alignment explains suffix, prefill and fine-tuning attacks</td></tr>
+        <tr><td>Yu et al., ReFAT</td><td>ICLR 2025</td><td><span class="tag ok">accepted</span></td><td>Refusal-feature ablation simulates attacks during adversarial training</td></tr>
+        <tr><td>Yousefpour et al., RepBend</td><td>ACL 2025</td><td><span class="tag ok">accepted</span></td><td>Steering-style vector arithmetic as a fine-tuning loss; up to 95% attack-success reduction</td></tr>
+        <tr><td>Che et al., Model Tampering Attacks</td><td>TMLR 2025</td><td><span class="tag ok">accepted</span></td><td>Eight removal methods recover 30+ WMDP-Bio points within sixteen steps</td></tr>
+        <tr><td>Łucki et al., Adversarial Perspective on Unlearning</td><td>TMLR 2025</td><td><span class="tag ok">accepted</span></td><td>Ten samples, direction removal, pruning or logit lens recover RMU capability</td></tr>
+        <tr><td>Lee et al., Distillation Robustifies Unlearning</td><td>NeurIPS 2025 spotlight</td><td><span class="tag ok">accepted</span></td><td>Unlearn, noise, distill matches retraining robustness at 60 to 80% of compute</td></tr>
+        <tr><td>Bailey et al., Obfuscated Activations</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Probe recall 100% to 0% at 90% jailbreak rate; all monitor families evaded</td></tr>
+        <tr><td>O'Brien et al., Deep Ignorance</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Pretraining-data filtering holds for 10,000 adversarial steps</td></tr>
+        <tr><td>Ponkshe et al., Safety Subspaces Not Linearly Distinct</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Safe and useful behaviour share subspaces</td></tr>
+        <tr><td>Zhang et al., GuardSpace</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Null-space projector plus safety-irrelevant LoRA initialization</td></tr>
+        <tr><td>Zhang et al., Any-Depth Alignment</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Reinserting assistant-header tokens mid-stream; attack success below 3%</td></tr>
+        <tr><td>Wang et al., SEAM</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Harmful fine-tuning collapses the model</td></tr>
+        <tr><td>Gu et al., Probing Safety Robustness in Latent Space</td><td>ACL 2026</td><td><span class="tag ok">accepted</span></td><td>Activation-steering attack; the vulnerable layer moves after robustness training</td></tr>
+        <tr><td>Wu et al., NeuroStrike</td><td>NDSS 2026</td><td><span class="tag ok">accepted</span></td><td>Pruning under 0.6% of neurons; 76.9% average attack success</td></tr>
+        <tr><td>Casper et al., Open Technical Problems in Open-Weight Risk Management</td><td>TMLR 2026</td><td><span class="tag ok">accepted</span></td><td>Sixteen open challenges; survey certification</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="probes">
+  <h2>White-box monitoring and probes</h2>
+  <p class="lede"><strong>Probes reached production while their adversarial robustness stayed unresolved.</strong></p>
+  <p>The accepted core is narrow and consistent. McKenzie et al. (NeurIPS 2025) trained six probe architectures on about 8,000 synthetic samples: a Llama-3.3-70B attention probe averaged 0.916 AUROC across six real-world out-of-distribution datasets against 0.929 for the prompted model, at roughly a millionth of the cost, and caught 43% of high-stakes cases at 1% false positives against 55% for the best LLM baseline. Zhao et al. (NeurIPS 2025) identify a harmfulness direction distinct from the refusal direction, show that some jailbreaks suppress refusal without changing the internal harmfulness judgment, and report a Latent Guard comparable to Llama Guard 3 8B with less over-refusal. JBShield (USENIX Security 2025, accepted per the paper) flags inputs when both a toxic-concept and a jailbreak-concept subspace activate.</p>
+  <p>Deception detection shows the sharpest turn from optimism to caution. Goldowsky-Dill et al. (ICML 2025) reached AUROC 0.964 to 0.999 on roleplay, insider-trading and sandbagging deception at layer 22 of Llama-3.3-70B, while calling the result insufficient as a robust defense and documenting probes that fire on honest responses in deception-themed scenarios. Every strong 2026 follow-up is non-peer-reviewed and more pessimistic <span class="tag pre">preprint</span>: UK AISI's belief-verified organisms sharply degrade all activation and logprob detectors, Anthropic's honesty work found linear truth probes capping near 0.82 AUC and stopped pursuing them, and EleutherAI reports sign inversion on at least one out-of-distribution set for every probe tested. Two groups converge on an instructions-versus-intent confound, which makes AUROC on prompted organisms an upper bound. Tice et al. (NeurIPS 2025) remain the main accepted non-probe detector, using weight noise to make sandbagging models improve anomalously.</p>
+  <p>The sparse-autoencoder debate resolved into a division of labour. Kantamneni et al. (ICML 2025) found no ensemble containing SAEs that consistently beat baselines; Google DeepMind's negative-results post <span class="tag pre">preprint</span> found dense probes clearly better on harmful-intent detection and deprioritized fundamental SAE research; Peng et al. (ICML 2026) reframe SAEs as tools for discovering unknown concepts, which matches where they kept producing results: model diffing (Minder et al., NeurIPS 2025 and ICLR 2026) and the persona-features result. Robustness is the unresolved axis. Bailey et al. (ICLR 2026) and two workshop papers converge on aggregation as the partial remedy: max-pooling and attention probes resist where mean and token-level probes fail, and the production systems adopted exactly these choices, though no paper claims adversarial robustness. On introspection, Binder et al. and Betley et al. (ICLR 2025), LatentQA (ICLR 2026) and Macar et al. (ICML 2026) establish some privileged but unreliable self-access, and the 2026 move is to train the channel and verify its outputs.</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Accepted core and the deployment reports</caption>
+      <thead><tr><th>Paper</th><th>Venue</th><th>Status</th><th>Contribution</th></tr></thead>
+      <tbody>
+        <tr><td>Goldowsky-Dill et al., Strategic Deception Probes</td><td>ICML 2025</td><td><span class="tag ok">accepted</span></td><td>AUROC 0.964 to 0.999; authors call it insufficient as a defense</td></tr>
+        <tr><td>Kantamneni et al., Are SAEs Useful?</td><td>ICML 2025</td><td><span class="tag ok">accepted</span></td><td>No SAE ensemble consistently beats baselines in sparse probing</td></tr>
+        <tr><td>McKenzie et al., High-Stakes Activation Probes</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Attention and softmax probes generalize best; cascade with an LLM judge</td></tr>
+        <tr><td>Zhao et al., Harmfulness and Refusal Encoded Separately</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Distinct harmfulness direction; Latent Guard rivals Llama Guard 3</td></tr>
+        <tr><td>Tice et al., Noise Injection</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Weight noise makes sandbagging models improve anomalously</td></tr>
+        <tr><td>Golechha and Garriga-Alonso, Among Us</td><td>NeurIPS 2025 spotlight</td><td><span class="tag ok">accepted</span></td><td>Off-policy probes above 95% AUROC on deceptive game statements</td></tr>
+        <tr><td>Minder et al., Crosscoder Sparsity Artifacts</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Model diffing yields chat-specific causal latents</td></tr>
+        <tr><td>Zhang et al., JBShield</td><td>USENIX Security 2025</td><td><span class="tag ok">accepted</span></td><td>Dual concept-subspace detector; attack success 61% to 2% (self-reported venue)</td></tr>
+        <tr><td>Minder et al., Narrow Finetuning Leaves Traces</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Activation differences on random text reveal the fine-tuning domain</td></tr>
+        <tr><td>Pan et al., LatentQA</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>A decoder LLM answers questions about activations and can steer</td></tr>
+        <tr><td>Peng et al., Use SAEs to Discover Unknowns</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>SAEs for discovery, not for acting on known concepts</td></tr>
+        <tr><td>Macar et al., Mechanisms of Introspective Awareness</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>Models detect injected steering vectors with no false positives</td></tr>
+        <tr><td>Anthropic, internals classifiers and Constitutional Classifiers++</td><td>Lab report</td><td><span class="tag pre">preprint</span></td><td>40x compute reduction at a 0.05% production refusal rate</td></tr>
+        <tr><td>Google DeepMind, activation probes for Gemini</td><td>arXiv</td><td><span class="tag pre">preprint</span></td><td>Probes about 10,000x cheaper than LLM classifiers; deployed in Gemini</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="reasoning">
+  <h2>Latent reasoning and monitorability</h2>
+  <p class="lede"><strong>Latent reasoning looks less opaque than feared, and explicit reasoning less transparent.</strong></p>
+  <p>The threat case was made on first principles. Korbak et al. <span class="tag pre">preprint</span>, forty-one authors across seven organizations, argue that architectures reasoning in continuous latent space may not verbalize their thoughts, and distinguish a model's necessity to think out loud from its propensity to do so. The Frontier Model Forum brief <span class="tag pre">preprint</span> recommends preferring architectures that require chain of thought until interpretability catches up.</p>
+  <p>The measurements complicate that case in both directions. Dilgren and Wiegreffe (COLM 2026) studied Coconut and CODI at GPT-2 and 1B scale: on logical reasoning the latent models rarely need any latent token, where explicit-CoT models still need 47 to 98% of their reasoning tokens, and when latents do matter a vocabulary projection recovers the gold trace in 65 to 93% of correct predictions. Li et al. (ICML 2026) model latent steps in a structural causal model and find staged functionality with skip-dominated routing. Meanwhile explicit chain of thought hides computation already: Boppana et al. (ICML 2026) decode the final answer from activations on DeepSeek-R1 and GPT-OSS-120B well before a CoT monitor detects it; Chen et al. <span class="tag pre">preprint</span> found Claude 3.7 Sonnet verbalizing used hints 25% of the time and DeepSeek R1 39%, with injected reward hacks exploited on more than 99% of examples and verbalized in fewer than 2%; Arcuschin et al. (ICML 2026) show unfaithful chains of thought on natural prompts without injected bias. Part of the monitorability loss attributed to latent architectures is therefore already present in explicit-CoT frontier models.</p>
+  <p>The one direct latent-versus-explicit comparison is Ferreira et al. <span class="tag pre">preprint</span>, who train one 1B model as no-CoT, explicit-CoT, CODI and SIM-CoT: losing the readable trace does not necessarily reduce monitorability, task properties matter more than reasoning mode, and an attention-pooled activation probe was the most consistent monitor across modes. Obfuscation under optimization pressure is the better-established risk. Baker et al. <span class="tag pre">preprint</span> found that rewarding against a CoT monitor produces obfuscated reward hacking and recommend a monitorability tax; Drori et al. (ICLR 2026) show that training only against output monitors still obfuscates the chain of thought through feedback spillover, with reward targeting as a Pareto improvement. Steganography remains asymmetric: Zolkowski et al. (ICLR 2026) judge the capability nascent, while Skaf et al. (NeurIPS 2025) show that penalizing a class of strings under process supervision yields an encoding scheme that transfers to held-out strings.</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Accepted core and the position papers</caption>
+      <thead><tr><th>Paper</th><th>Venue</th><th>Status</th><th>Contribution</th></tr></thead>
+      <tbody>
+        <tr><td>Arnav et al., CoT Red-Handed</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>CoT monitoring catches subtle sabotage; hybrid monitors beat both</td></tr>
+        <tr><td>Skaf et al., Steganographic CoT under Process Supervision</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Penalizing a string class yields a transferable encoding scheme</td></tr>
+        <tr><td>Drori et al., Output Supervision Can Obfuscate the CoT</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Feedback spillover; Mind and Face plus reward targeting</td></tr>
+        <tr><td>Zolkowski et al., Early Signs of Steganographic Capabilities</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Encoded reasoning is nascent and needs a pre-agreed scheme</td></tr>
+        <tr><td>Shen et al., FaithCoT-Bench</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Instance-level faithfulness benchmark with eleven detectors</td></tr>
+        <tr><td>Du et al., Latent Thinking Optimization</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Huginn-3.5B latent thoughts are linearly readable as a reward signal</td></tr>
+        <tr><td>Guan et al., Monitoring Monitorability</td><td>ICML 2026 oral</td><td><span class="tag ok">accepted</span></td><td>Thirteen evaluations; CoT monitors beat action-only; RL does not yet reduce monitorability</td></tr>
+        <tr><td>Boppana et al., Reasoning Theater</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>Answer decodable from activations before the CoT reveals it</td></tr>
+        <tr><td>Arcuschin et al., CoT In The Wild Is Not Always Faithful</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>Unfaithful CoT without injected bias</td></tr>
+        <tr><td>Li et al., Dynamics Within Latent CoT</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>Staged functionality with skip-dominated routing</td></tr>
+        <tr><td>Dilgren and Wiegreffe, Are Latent Reasoning Models Interpretable?</td><td>COLM 2026</td><td><span class="tag ok">accepted</span></td><td>Latents often not load-bearing; gold traces recoverable</td></tr>
+        <tr><td>Wang et al., MonitorBench</td><td>COLM 2026</td><td><span class="tag ok">accepted</span></td><td>Monitorability is conditional on model, monitor and task</td></tr>
+        <tr><td>Chang et al., Unlocking the Black Box of Latent Reasoning</td><td>ACL 2026</td><td><span class="tag ok">accepted</span></td><td>Early latent vectors are causal hubs; decode-time intervention</td></tr>
+        <tr><td>Korbak et al., CoT Monitorability</td><td>arXiv</td><td><span class="tag pre">preprint</span></td><td>Position paper; necessity versus propensity to verbalize</td></tr>
+        <tr><td>Ferreira et al., latent versus explicit monitorability</td><td>arXiv</td><td><span class="tag pre">preprint</span></td><td>Only head-to-head comparison; task structure matters more than mode</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="agents">
+  <h2>Agents, multi-agent systems and memory</h2>
+  <p class="lede"><strong>Capability work is accepted; the safety work is not yet.</strong></p>
+  <p>No main-track paper applies activation steering to a standard agentic safety benchmark with a win over prompt-level defenses. The agent-specific findings that exist are cautionary and at workshops <span class="tag ws">workshop</span>: Koduru et al. find harm refusal dropping sharply from chat to desktop-agent mode, with steering along a harm direction improving chat refusal but having little selective effect in agent mode; Chen et al. find tool-use steering works from heading-anchor tokens while a probe that separates code from reasoning states at AUROC 1.000 is a weak causal controller. The accepted bright spot is embedding-level architecture: ASIDE (Zverev et al., ICLR 2026) rotates data-token embeddings by ninety degrees and cuts indirect-injection success from 14.7% to 4.9% on BIPIA-text, with the stated limits of single-turn evaluation and known token roles.</p>
+  <p>For decomposition attacks, where a harmful task is split into individually benign sub-tasks, every located defense is text-level. Yueh-Han et al. (ICLR 2026) report decomposition raising attack success on GPT-4o from 21.2% to 87.2% and a cumulative-history text monitor reaching F1 0.913, without mentioning hidden states even as future work. Kothamasu et al. <span class="tag ws">workshop</span> report monolithic refusal of 88 to 96% collapsing to 6 to 17% for decomposed variants, with guard models labelling about 97% of subtasks benign, and evaluate no latent defense. The explanation for why single-turn latent defenses fail here is in Bullwinkel et al. <span class="tag ws">workshop</span>: probes classify a decreasing share of response tokens as harmful as turns accumulate.</p>
+  <p>Latent inter-agent communication is the clearest one-year lag. Cache-to-Cache, KVComm (ICLR 2026), LatentMAS (ICML 2026 spotlight), Thought Communication (NeurIPS 2025 spotlight) and Interlat (ACL 2026) establish latent channels without discussing safety or human readability. The safety response is 2026 and non-archival <span class="tag pre">preprint</span>: benignly trained residual-MLP links raise average harmful compliance from 4.4 to 31.1, with a target-free RL attack reaching 76.9; vanilla KV sharing yields adversarial-decoder attack success of 0.76 to 0.89 on PrivacyLens; per-agent activation probes reach 0.99 to 1.00 AUROC on a steganographic collusion task that transcript monitors fail <span class="tag ws">workshop</span>. Memory is an arms race conducted entirely in text space: MINJA (NeurIPS 2025) reaches 98.2% injection success through queries alone and records that embedding-level sanitization fails because malicious and benign records are entangled; A-MemGuard (ICML 2026) cuts retrieval-stage attack success on EHRAgent from 100 to about 2 through consensus validation over reasoning paths. White-box agent monitoring is where results are strongest and least archival: post-hoc action probes score 0.979 to 0.984 AUROC on SHADE-Arena against 0.960 for a frontier text monitor <span class="tag pre">preprint</span>, while pre-action probes carry three documented negative results <span class="tag ws">workshop</span>.</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Accepted core and the strongest non-archival results</caption>
+      <thead><tr><th>Paper</th><th>Venue</th><th>Status</th><th>Contribution</th></tr></thead>
+      <tbody>
+        <tr><td>Abdelnabi et al., Get My Drift?</td><td>SaTML 2025</td><td><span class="tag ok">accepted</span></td><td>Activation-delta probes detect task drift out of distribution</td></tr>
+        <tr><td>Dong et al., MINJA</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>98.2% memory-injection success; embedding sanitization fails on entanglement</td></tr>
+        <tr><td>Zheng et al., Thought Communication</td><td>NeurIPS 2025 spotlight</td><td><span class="tag ok">accepted</span></td><td>Shared latent thoughts between models; safety not discussed</td></tr>
+        <tr><td>Lu et al., X-Boundary</td><td>Findings of EMNLP 2025</td><td><span class="tag ok">accepted</span></td><td>Exact safety boundary for multi-turn defense with less over-refusal</td></tr>
+        <tr><td>Zverev et al., ASIDE</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Rotated data-token embeddings; injection success 14.7% to 4.9%</td></tr>
+        <tr><td>Yueh-Han et al., Monitoring Decomposition Attacks</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Text-only cumulative monitor reaches F1 0.913</td></tr>
+        <tr><td>Shao et al., Your Agent May Misevolve</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Safety degrades after memory accumulation and tool reuse</td></tr>
+        <tr><td>Fu et al., Cache-to-Cache; Shi et al., KVComm</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>KV-cache communication between models; no safety analysis</td></tr>
+        <tr><td>Zou et al., LatentMAS</td><td>ICML 2026 spotlight</td><td><span class="tag ok">accepted</span></td><td>Training-free latent collaboration; no oversight analysis</td></tr>
+        <tr><td>Wei et al., A-MemGuard</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>Consensus validation over reasoning paths; text-level</td></tr>
+        <tr><td>Ustaomeroglu and Qu, BLOCK-EM</td><td>ICML 2026</td><td><span class="tag ok">accepted</span></td><td>Latent blocking during fine-tuning cuts emergent misalignment</td></tr>
+        <tr><td>Du et al., Interlat</td><td>ACL 2026</td><td><span class="tag ok">accepted</span></td><td>Agents communicate entirely in latent space</td></tr>
+        <tr><td>Koduru et al., Chat-safe is not CUA-safe</td><td>NeurIPS 2026 workshop</td><td><span class="tag ws">workshop</span></td><td>Harm-direction steering helps chat refusal, little effect in agent mode</td></tr>
+        <tr><td>Rose et al., collusion probes</td><td>NeurIPS 2026 workshop</td><td><span class="tag ws">workshop</span></td><td>Per-agent activation probes detect steganographic collusion at 0.99 AUROC</td></tr>
+        <tr><td>Hollinsworth et al., action probes on SHADE-Arena</td><td>ICLR 2027 submission</td><td><span class="tag pre">preprint</span></td><td>0.979 to 0.984 AUROC against 0.960 for a frontier text monitor</td></tr>
+        <tr><td>Huzaifa et al., latent links degrade safety</td><td>arXiv</td><td><span class="tag pre">preprint</span></td><td>Benign latent links raise harmful compliance from 4.4 to 31.1</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="vlm">
+  <h2>Vision-language models</h2>
+  <p class="lede"><strong>The accepted papers agree on the geometry of the failure and disagree on the fix.</strong></p>
+  <p>Adding an image moves the last-token residual stream off the text-only distribution on which the backbone's safety behaviour was learned, and the shifted activations project onto the compliance side of the safety direction, so refusal never fires even though harmful intent remains linearly decodable. ShiftDC (Zou et al., NeurIPS 2025) quantifies this: successful jailbreak inputs have cosine above 0.7 between the modality-induced shift and the safety direction where failed ones sit below 0.2, even a blank image produces a positive shift, and text-trained probes fall from about 90% safety accuracy to about 65% on image-text inputs. HiddenDetect (Jiang et al., ACL 2025) finds refusal strength suppressed and its per-layer peak delayed for jailbreak queries. TGA (Xu et al., ICLR 2025) locates the fault at specific safety-activating layers.</p>
+  <p>The disagreement is over the causal locus, and therefore the intervention point. CMRM (Liu et al., Findings of ACL 2025) treats it as a global modality shift and subtracts a shift vector at every layer, cutting the LLaVA-7B VLSafe unsafe rate from 61.5% to 3.2%. Wang et al. (CVPR 2025) attribute the gap to data-distribution bias and restore safety by fine-tuning on benign instructions with refusal responses. Safety Mirage (Chen et al., ICLR 2026) attributes it to spurious text-pattern correlations learned in safety fine-tuning. Bachu et al. (ICML 2025 spotlight) locate it in the image encoder, where early exits make models markedly more likely to produce harmful output. These read as complementary: the data-bias view explains why the backbone never learned to map image-shifted activations to refusal, and the geometric view describes what those activations look like.</p>
+  <p>The intervention trend runs from static all-input subtraction toward input-conditioned, gated and subspace-constrained steering on the first generated tokens. ASTRA (CVPR 2025) gates by projection sign so benign inputs are untouched; AutoSteer (EMNLP 2025) selects the most safety-discriminative layer and intervenes only when a prober flags risk, cutting LLaVA-OV VLSafe attack success from 60.0% to 4.2% with utility unchanged; JailNeurons (Gan et al., ICLR 2026) localizes neurons whose masking flips compliance to refusal, reporting true-positive rates of 0.94 to 1.0 at 5% false positives, and 39% false positives on an over-refusal stress set. Side effects are under-measured: only ShiftDC reports a safe-input delta among accepted steering papers. Two preprints bound generalization <span class="tag pre">preprint</span>: a cross-architecture audit found no candidate direction winning on both refusal recovery and utility and no transfer between two decoder families, and MARS finds text-only refusal directions spuriously steer safe multimodal inputs toward refusal unless activations are re-centred. On the attack side, JailBound (NeurIPS 2025) crosses an approximated fusion-layer safety boundary for 94.3% white-box attack success across six VLMs, UltraBreak (ICLR 2026) optimizes in the target LLM's text-embedding space for transfer, and VISOR++ <span class="tag pre">preprint</span> optimizes a single image whose effect matches a steering vector's. Nothing accepted applies latent steering or probing to VLM agents in interactive or GUI environments.</p>
+  <div class="tablewrap">
+    <table>
+      <caption>Accepted core and the bounding preprints</caption>
+      <thead><tr><th>Paper</th><th>Venue</th><th>Status</th><th>Contribution</th></tr></thead>
+      <tbody>
+        <tr><td>Xu et al., TGA</td><td>ICLR 2025</td><td><span class="tag ok">accepted</span></td><td>Aligns image hidden states to caption hidden states at safety layers</td></tr>
+        <tr><td>Wang et al., ASTRA</td><td>CVPR 2025</td><td><span class="tag ok">accepted</span></td><td>Projection-gated steering against adversarial images</td></tr>
+        <tr><td>Jiang et al., HiddenDetect</td><td>ACL 2025</td><td><span class="tag ok">accepted</span></td><td>Refusal-token hidden-state detector; delayed refusal peaks</td></tr>
+        <tr><td>Liu et al., CMRM</td><td>Findings of ACL 2025</td><td><span class="tag ok">accepted</span></td><td>All-layer shift subtraction; VLSafe unsafe rate 61.5% to 3.2%</td></tr>
+        <tr><td>Bachu et al., Layer-wise Alignment</td><td>ICML 2025 spotlight</td><td><span class="tag ok">accepted</span></td><td>Image-encoder early exits break safety; layer-wise RLHF</td></tr>
+        <tr><td>Zou et al., ShiftDC</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Removes the safety-relevant component of the modality shift</td></tr>
+        <tr><td>Song et al., JailBound</td><td>NeurIPS 2025</td><td><span class="tag ok">accepted</span></td><td>Fusion-layer boundary crossing; 94.3% white-box attack success</td></tr>
+        <tr><td>Wu et al., AutoSteer</td><td>EMNLP 2025</td><td><span class="tag ok">accepted</span></td><td>Prober-gated refusal head; attack success 60.0% to 4.2%</td></tr>
+        <tr><td>Gan et al., JailNeurons</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Neuron-localized detector; 39% false positives on an over-refusal set</td></tr>
+        <tr><td>Chen et al., Safety Mirage</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Spurious safety-fine-tuning correlations; fixed by unlearning</td></tr>
+        <tr><td>Cui et al., UltraBreak</td><td>ICLR 2026</td><td><span class="tag ok">accepted</span></td><td>Embedding-space objective for transferable image jailbreaks</td></tr>
+        <tr><td>Cross-architecture steering audit</td><td>arXiv</td><td><span class="tag pre">preprint</span></td><td>No direction wins on both safety and utility; no cross-family transfer</td></tr>
+        <tr><td>VISOR++</td><td>arXiv</td><td><span class="tag pre">preprint</span></td><td>One optimized image reproduces a steering vector's effect</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="trends">
+  <h2>Cross-cutting trends and disagreements</h2>
+  <p>Four trends run across all six sub-areas. <strong>Aggregation</strong> is the only consistently replicated hardening lesson: max-pooling or attention over tokens, multiple layers and generation-token readouts win for out-of-distribution generalization, evasion resistance and reasoning-trajectory monitoring, and two production systems adopted these choices independently. <strong>Gating and conditioning</strong> unite AlphaSteer's null-space constraint, AutoSteer's prober-gated head, ASTRA's projection gate and activation capping: the intervention should be near-identity on benign inputs. <strong>Training-time and monitoring-time methods</strong> are displacing post-hoc surgery, through preventative steering, probabilistic refusal-direction ablation, geometry-preserving fine-tuning and latent blocking. <strong>Evaluation is the contribution</strong>, with the community converging on trade-off curves rather than single operating points and on measuring unrelated behaviours.</p>
+  <dl class="dis">
+    <dt>Does steering beat prompting?</dt>
+    <dd>AxBench (ICML 2025) and SteerScope <span class="tag pre">preprint</span> both say no on the joint frontier, which leaves reversibility, parameter efficiency, conditional application and a compromised prompt channel as the case for latent control.</dd>
+    <dt>Are safety subspaces isolable?</dt>
+    <dd>Ponkshe et al. (ICLR 2026) say no, while GuardSpace and the Superficial Safety Alignment Hypothesis (both ICLR 2026) proceed as if yes.</dd>
+    <dt>Is ELM robust?</dt>
+    <dd>Accepted at NeurIPS 2025 claiming adversarial robustness, reported as the most prompt-vulnerable of eight methods in a COLM 2025 workshop paper, and recovered by fine-tuning in Che et al. (TMLR 2025).</dd>
+    <dt>Does latent access favour defense or attack?</dt>
+    <dd>AlphaSteer, ASGuard and Jailbreak Antidote were accepted as steering-based defenses, while The Rogue Scalpel and the ICML 2026 probe-based steering attack show steering degrades refusal. Inference-time steering is better framed as a shared primitive.</dd>
+    <dt>Does latent reasoning reduce monitorability?</dt>
+    <dd>The position literature says yes on first principles; the measurement literature says task structure and white-box access matter more; no study measures it above roughly 4B parameters.</dd>
+  </dl>
+  <p>Two structural facts shape how to read all of this. Frontier-lab work is largely non-archival: persona vectors, the Assistant Axis, internals classifiers, Constitutional Classifiers++, honesty and lie-detection work, the Gemini probes, Gemma Scope 2 and the obfuscated-reward-hacking paper are preprints or blog posts, with OpenAI's persona-features paper (ICLR 2026) and Monitoring Monitorability (ICML 2026) the main exceptions. And attack and agent-safety work has a poor acceptance record: five latent-attack papers were withdrawn or rejected at ICLR 2026, and the strongest agentic probe results are under review. A review built only on accepted papers systematically understates what is known about evasion and about agents.</p>
+</section>
+
+<section id="open">
+  <h2>Open problems the papers state</h2>
+  <ul class="plain">
+    <li><strong>Steering.</strong> Unreliable when a behaviour lacks a coherent linear direction; reliance on contrastive pairs; no guarantees for multi-concept composition; the unmet bar of beating prompting on the joint frontier. Li et al. call for inherently safe steering and for alignment that builds geometric robustness into the model.</li>
+    <li><strong>Durability.</strong> Whether models can be made robust to tampering at all; which mechanisms underlie robust capability removal; how to bring tampering evaluation into practice (Che et al.). Evaluation protocols must account for randomness, implementation details and explicit threat models naming tools such as LoRA (Qi et al.). The obfuscation and performance trade-off is uncharacterized, and nobody has shown adversarial training exhausts the attacker's obfuscated regions (Bailey et al.).</li>
+    <li><strong>Monitoring.</strong> The instructions-versus-intent confound for deception probes; threshold transfer across datasets; no monitor survives both embedding-space obfuscation and RL-trained evasion. Guan et al. propose but do not run their evaluations on internal latents.</li>
+    <li><strong>Agents and multi-agent systems.</strong> A proposed monitor should be evaluated as a forecasting and specificity claim with scenario-generalization and concept-specificity controls. Why latent-link poisoning saturates near 20%, what the vulnerable links encode, and the malicious-endpoint case beyond transport authentication are all open. Content-only memory screening cannot distinguish false from true assertions without external grounding.</li>
+    <li><strong>Multimodal models.</strong> Dependence on an already-aligned text backbone; architecture-specific directions that do not transfer; unmeasured over-refusal; white-box access requirements; coarse attack-success judges; and the unproven timing hypothesis about when safety checking occurs relative to visual semantic integration.</li>
+  </ul>
+</section>
+
+<section id="gaps">
+  <h2>Where the accepted record stops</h2>
+  <p>Each item below is a hypothesis suggested by the gaps in the literature, not a finding; several rest partly on non-archival evidence.</p>
+  <ul class="gaps">
+    <li>
+      <h3>A cumulative latent monitor for decomposition attacks</h3>
+      <p>Decomposition defenses have converged on stateful, cumulative, text-level monitoring; the hidden-state analogue, a probe accumulating evidence of harmful intent across benign-looking subtasks, does not exist in accepted form. The mechanism is stated: as benign-looking intermediate responses accumulate, representations drift toward benign, so a per-turn probe trained on single-turn contrasts under-fires exactly when decomposition succeeds. Cross-account distributed attacks defeat the premise, since no single forward pass contains the harmful intent.</p>
+    </li>
+    <li>
+      <h3>Aggregation-constrained training rather than aggregated monitors</h3>
+      <p>Three independent sources find holistic, multi-layer or ensemble readouts resist obfuscation where token-level ones fail. No accepted paper tests whether an aggregation-constrained training objective inherits that robustness, and the design transfers directly to multi-agent settings where each agent's activations are read separately.</p>
+    </li>
+    <li>
+      <h3>Latent monitoring of agent memory at write and retrieval time</h3>
+      <p>No work asks whether an agent's own hidden states at write or retrieval time carry a detectable signal of poisoning. MINJA's entanglement observation, usually cited as the reason not to try, concerns retriever embeddings of the records rather than the target model's activations while consuming them. A representation-level memory firewall that gates what is stored or retrieved is absent.</p>
+    </li>
+    <li>
+      <h3>Persona and misalignment directions inside a tool-using agent</h3>
+      <p>The representational machinery (toxic-persona features, a general-misalignment direction, the Assistant Axis, latent blocking) is mature enough to drop into an agent, while the only agentic measurement of drift is behavioural and conducted on closed models. Causal claims need unrelated-direction controls, since semantically unrelated control vectors have produced effects as large as designed ones, and any task-specific vector deployed in an agent scaffold is a candidate misalignment vector.</p>
+    </li>
+    <li>
+      <h3>VLM agents in interactive environments</h3>
+      <p>Nothing accepted applies latent steering or probing to VLM agents in games or GUIs; the one hidden-state intervention with agent-style evaluation operates on a single final-layer state and trades about seven points of task success for safety. Three constraints should shape such a study: measure verbal refusal, attempted harmful action and task completion separately; characterize chat-to-agent transfer with dose-response curves; and calibrate per model family, since no direction transferred between two decoder families.</p>
+    </li>
+    <li>
+      <h3>Monitoring the latent channel itself</h3>
+      <p>No located paper classifies the content of a latent channel in transit; existing guards transform or authenticate the shared cache. Task identity and agent roles are near-perfectly decodable from latent messages and per-agent collusion probes work where transcript monitors cannot, which suggests it is feasible. The counterweight is that latent links degrade safety even without an attacker.</p>
+    </li>
+    <li>
+      <h3>Two smaller, well-defined gaps</h3>
+      <p>The standard tamper-resistance benchmark omits its cheapest attack, refusal-direction ablation. And abliteration defense is active but almost entirely non-archival, with none of eight located defenses at a main conference.</p>
+    </li>
+  </ul>
+</section>
+
+<section id="refs">
+  <h2>References</h2>
+  <p>Grouped by sub-area and ordered as collected. Each entry gives the venue and acceptance status as verified on 27 October 2026, the arXiv identifier where one was recorded, and the page where the status was checked.</p>
+  <details class="refs"><summary>Steering and representation engineering<small>41 entries</small></summary>
+<ol>
+<li>Programming Refusal with Conditional Activation Steering (CAST). Lee et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2409.05907">arXiv 2409.05907</a>. <a href="https://iclr.cc/virtual/2025/poster/29806">iclr.cc</a></li>
+<li>Surgical, Cheap, and Flexible: Mitigating False Refusal via Single Vector Ablation. Wang et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.03415">arXiv 2410.03415</a>. <a href="https://arxiv.org/abs/2410.03415">arXiv</a></li>
+<li>Jailbreak Antidote: Runtime Safety-Utility Balance via Sparse Representation Adjustment. Shen et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.02298">arXiv 2410.02298</a>. <a href="https://arxiv.org/abs/2410.02298">arXiv</a></li>
+<li>Improving Instruction-Following through Activation Steering. Stolfo et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.12877">arXiv 2410.12877</a>. <a href="https://arxiv.org/abs/2410.12877">arXiv</a></li>
+<li>Refusal in LLMs is an Affine Function (ACE). Marshall et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2411.09003">arXiv 2411.09003</a>. <a href="https://arxiv.org/abs/2411.09003v3">arXiv</a></li>
+<li>The Geometry of Refusal in LLMs: Concept Cones and Representational Independence. Wollschläger et al. ICML 2025, accepted, PMLR v267 pp. 66945-66970. <a class="id" href="https://arxiv.org/abs/2502.17420">arXiv 2502.17420</a>. <a href="https://proceedings.mlr.press/v267/wollschlager25a.html">PMLR</a></li>
+<li>Refusal Direction is Universal Across Safety-Aligned Languages. Wang et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2505.17306">arXiv 2505.17306</a>. <a href="https://papers.neurips.cc/paper_files/paper/2025/hash/2e94772e3c079d83f79c311d07456111-Abstract-Conference.html">NeurIPS</a></li>
+<li>COSMIC: Generalized Refusal Direction Identification in LLM Activations. Siu et al. Findings of ACL 2025, accepted. <a href="https://aclanthology.org/2025.findings-acl.1310/">ACL Anthology</a></li>
+<li>Steering MoE LLMs via Expert (De)Activation (SteerMoE). Fayyaz et al. ICLR 2026, accepted. <a href="https://mlanthology.org/iclr/2026/fayyaz2026iclr-steering/">ML Anthology</a></li>
+<li>AlphaSteer: Learning Refusal Steering with Principled Null-Space Constraint. Sheng et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2506.07022">arXiv 2506.07022</a>. <a href="https://iclr.cc/virtual/2026/poster/10011789">iclr.cc</a></li>
+<li>Activation Steering with a Feedback Controller (PID Steering). Nguyen et al. ICLR 2026, accepted. <a href="https://mlanthology.org/iclr/2026/nguyen2026iclr-activation/">ML Anthology</a></li>
+<li>Fine-Grained Activation Steering: Steering Less, Achieving More (AUSteer). Feng et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2602.04428">arXiv 2602.04428</a>. <a href="https://iclr.cc/virtual/2026/poster/10008108">iclr.cc</a></li>
+<li>PERSONA: Dynamic and Compositional Inference-Time Personality Control. Feng et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2602.15669">arXiv 2602.15669</a>. <a href="https://www.alphaxiv.org/abs/2602.15669">alphaXiv</a></li>
+<li>Persona Features Control Emergent Misalignment. Wang et al. (OpenAI). ICLR 2026, accepted, proceedings pp. 48836-48885. <a class="id" href="https://arxiv.org/abs/2506.19823">arXiv 2506.19823</a>. <a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/50db99ee3bccf73bfe1cf2af1e960414-Abstract-Conference.html">ICLR proceedings</a></li>
+<li>Angular Steering: Behavior Control via Rotation in Activation Space. Vu and Nguyen. NeurIPS 2025, accepted. <a href="https://mlanthology.org/neurips/2025/vu2025neurips-angular/">ML Anthology</a></li>
+<li>Steering When Necessary: Flexible Steering LLMs with Backtracking (FASB). Cheng et al. NeurIPS 2025, accepted. <a href="https://mlanthology.org/neurips/2025/cheng2025neurips-steering/">ML Anthology</a></li>
+<li>One-shot Optimized Steering Vectors Mediate Safety-relevant Behaviors. Dunefsky and Cohan. COLM 2025, accepted (paper header). <a class="id" href="https://arxiv.org/abs/2502.18862">arXiv 2502.18862</a>. <a href="https://arxiv.org/abs/2502.18862">arXiv</a></li>
+<li>Towards Steering without Sacrifice: Principled Training of Steering Vectors (PrOSV). Bao et al. ICML 2026, accepted, PMLR v306 pp. 6370-6432. <a href="https://proceedings.mlr.press/v306/bao26b.html">PMLR</a></li>
+<li>Weight Updates as Activation Shifts: A Principled Framework for Steering. Adila et al. ICML 2026, accepted, PMLR v306 pp. 565-590. <a href="https://proceedings.mlr.press/v306/adila26a.html">PMLR</a></li>
+<li>Concept Heterogeneity-aware Representation Steering (CHaRS). Abdullaev et al. ICML 2026, accepted, PMLR v306 pp. 125-149. <a href="https://proceedings.mlr.press/v306/abdullaev26a.html">PMLR</a></li>
+<li>Belief Dynamics Reveal the Dual Nature of In-Context Learning and Activation Steering. Bigelow et al. ICML 2026, accepted, PMLR v306 pp. 8248-8276. <a href="https://proceedings.mlr.press/v306/bigelow26a.html">PMLR</a></li>
+<li>AxBench: Steering LLMs? Even Simple Baselines Outperform Sparse Autoencoders. Wu et al. ICML 2025, accepted, PMLR v267 pp. 67035-67080. <a class="id" href="https://arxiv.org/abs/2501.17148">arXiv 2501.17148</a>. <a href="https://proceedings.mlr.press/v267/wu25a.html">PMLR</a></li>
+<li>Beyond Prompt Engineering: Robust Behavior Control via Steering Target Atoms (STA). Wang et al. ACL 2025 Long, accepted, pp. 23381-23399. <a class="id" href="https://arxiv.org/abs/2505.20322">arXiv 2505.20322</a>. <a href="https://aclanthology.org/2025.acl-long.1139/">ACL Anthology</a></li>
+<li>Steering Language Model Refusal with Sparse Autoencoders. O&#x27;Brien et al. ICML 2025 workshop only. <a class="id" href="https://arxiv.org/abs/2411.11296">arXiv 2411.11296</a>. <a href="https://icml.cc/virtual/2025/50928">icml.cc</a></li>
+<li>Analysing the Safety Pitfalls of Steering Vectors. Li et al. Findings of ACL 2026, accepted, pp. 11182-11204. <a class="id" href="https://arxiv.org/abs/2603.24543">arXiv 2603.24543</a>. <a href="https://aclanthology.org/2026.findings-acl.544/">ACL Anthology</a></li>
+<li>Safety Cost of Steering Vectors Is Separable and Reducible. Li and Kasneci. ICML 2026 workshop only (spotlight). <a class="id" href="https://arxiv.org/abs/2608.08383">arXiv 2608.08383</a>. <a href="https://icml.cc/virtual/2026/76971">icml.cc</a></li>
+<li>The Rogue Scalpel: Activation Steering Compromises LLM Safety. Korznikov et al. ICLR 2026 workshop only; ICLR 2026 main track rejected. <a class="id" href="https://arxiv.org/abs/2509.22067">arXiv 2509.22067</a>. <a href="https://arxiv.org/html/2509.22067v2">arXiv HTML</a></li>
+<li>Steering Externalities: Benign Activation Steering Unintentionally Increases Jailbreak Risk. Xiong et al. ICML 2026 workshop only. <a href="https://icml.cc/virtual/2026/77978">icml.cc</a></li>
+<li>The Sharp Directions Are Against You: Curvature Analysis of Activation Steering. Azizi et al. NeurIPS 2026 poster listed on neurips.cc, main-track status unverified. <a href="https://neurips.cc/virtual/2026/poster/151909">neurips.cc</a></li>
+<li>StiCAS: Compositional Activation Steering via Stiefel Manifold Coordinate Transport. Doan et al. NeurIPS 2026 poster listed on neurips.cc, main-track status unverified. <a href="https://neurips.cc/virtual/2026/poster/152514">neurips.cc</a></li>
+<li>ASGuard: Activation-Scaling Guard to Mitigate Targeted Jailbreaking Attack. Park et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2509.25843">arXiv 2509.25843</a>. <a href="https://mlanthology.org/iclr/2026/park2026iclr-asguard/">ML Anthology</a></li>
+<li>A Course Correction in Steerability Evaluation. Chang et al. AAAI-26 Alignment track, accepted, pp. 37259-37267. <a class="id" href="https://arxiv.org/abs/2505.23816">arXiv 2505.23816</a>. <a href="https://ojs.aaai.org/index.php/AAAI/article/view/41057">AAAI</a></li>
+<li>ExpertLens: Activation Steering Features Are Highly Interpretable. Fedzechkina et al. (Apple). TMLR 2026, accepted (BibTeX record only). <a href="https://jmlr.org/tmlr/papers/bib/FBIsN6RdYO.bib">TMLR BibTeX</a></li>
+<li>Persona Vectors: Monitoring and Controlling Character Traits. Chen et al. (Anthropic). arXiv preprint only; one note records an ICLR 2026 rejection. <a class="id" href="https://arxiv.org/abs/2507.21509">arXiv 2507.21509</a>. <a href="https://arxiv.org/abs/2507.21509">arXiv</a></li>
+<li>The Assistant Axis: Situating and Stabilizing the Default Persona. Lu et al. (Anthropic). Tagged arXiv preprint only in three notes and as an ICML 2026 main-conference poster in the agents note. <a class="id" href="https://arxiv.org/abs/2601.10387">arXiv 2601.10387</a>. [arXiv](https://arxiv.org/abs/2601.10387); <a href="https://icml.cc/virtual/2026/poster/61446">icml.cc</a></li>
+<li>What Drives Representation Steering? A Mechanistic Case Study on Steering Refusal. Cheng et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2604.08524">arXiv 2604.08524</a>. <a href="https://www.alphaxiv.org/abs/2604.08524">alphaXiv</a></li>
+<li>Understanding (Un)Reliability of Steering Vectors in Language Models. Braun et al. ICLR 2025 workshop only. <a class="id" href="https://arxiv.org/abs/2505.22637">arXiv 2505.22637</a>. <a href="https://arxiv.org/abs/2505.22637">arXiv</a></li>
+<li>Does Steering Break Your Model? A Multi-Dimensional Evaluation Suite (SteerScope). Yang et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2610.07722">arXiv 2610.07722</a>. <a href="https://arxiv.org/abs/2610.07722">arXiv</a></li>
+<li>SteeringControl: Holistic Evaluation of Alignment Steering in LLMs. Siu et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2509.13450">arXiv 2509.13450</a>. <a href="https://arxiv.org/html/2509.13450v1">arXiv HTML</a></li>
+<li>Representation Engineering survey. Wehner et al. TMLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2502.19649">arXiv 2502.19649</a>. <a href="https://arxiv.org/abs/2502.19649">arXiv</a></li>
+<li>Gemma Scope 2. Google DeepMind blog, 19 Dec 2025. Lab report, non-peer-reviewed. <a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior">DeepMind</a></li>
+</ol>
+</details>
+<details class="refs"><summary>Latent-space attacks and training-time defenses<small>54 entries</small></summary>
+<ol>
+<li>Improving Alignment and Robustness with Circuit Breakers. Zou et al. NeurIPS 2024, accepted. <a class="id" href="https://arxiv.org/abs/2406.04313">arXiv 2406.04313</a>. <a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/97ca7168c2c333df5ea61ece3b3276e1-Abstract.html">NeurIPS</a></li>
+<li>Tamper-Resistant Safeguards (TAR). Tamirisa et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2408.00761">arXiv 2408.00761</a>. <a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/fc49a629d33bc2461ed7a715ce44da68-Abstract-Conference.html">ICLR proceedings</a></li>
+<li>Latent Adversarial Training Improves Robustness to Persistent Harmful Behaviors. Sheshadri et al. TMLR 2025, accepted; rejected at ICLR 2025. <a class="id" href="https://arxiv.org/abs/2407.15549">arXiv 2407.15549</a>. <a href="https://openreview.net/forum?id=6LxMeRlkWl">TMLR</a></li>
+<li>Obfuscated Activations Bypass LLM Latent-Space Defenses. Bailey et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2412.09565">arXiv 2412.09565</a>. <a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/ed687a5f52b651b19e7c18f702907b8b-Abstract-Conference.html">ICLR proceedings</a></li>
+<li>On Evaluating the Durability of Safeguards for Open-Weight LLMs. Qi et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2412.07097">arXiv 2412.07097</a>. <a href="https://arxiv.org/html/2412.07097v1">arXiv HTML</a></li>
+<li>Model Tampering Attacks Enable More Rigorous Evaluations of LLM Capabilities. Che et al. TMLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2502.05209">arXiv 2502.05209</a>. <a href="https://arxiv.org/html/2502.05209v4">arXiv HTML</a></li>
+<li>An Adversarial Perspective on Machine Unlearning for AI Safety. Łucki et al. TMLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2409.18025">arXiv 2409.18025</a>. <a href="https://arxiv.org/html/2409.18025v6">arXiv HTML</a></li>
+<li>Deep Ignorance: Filtering Pretraining Data Builds Tamper-Resistant Safeguards. O&#x27;Brien et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2508.06601">arXiv 2508.06601</a>. <a href="https://arxiv.org/abs/2508.06601">arXiv</a></li>
+<li>Safety Subspaces are Not Linearly Distinct. Ponkshe et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2505.14185">arXiv 2505.14185</a>. <a href="https://arxiv.org/abs/2505.14185">arXiv</a></li>
+<li>Prompt Attacks Reveal Superficial Knowledge Removal in Unlearning Methods. Jang et al. COLM 2025 workshop only. <a class="id" href="https://arxiv.org/abs/2506.10236">arXiv 2506.10236</a>. <a href="https://arxiv.org/pdf/2506.10236">arXiv</a></li>
+<li>Simple Activation Clipping Defeats Circuit Breakers. Yakushev and Pupkov. COLM 2026 workshop only. <a href="https://openreview.net/forum?id=NOytzddtcP">OpenReview</a></li>
+<li>Revisiting the Robust Alignment of Circuit Breakers. Schwinn and Geisler. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2407.15902">arXiv 2407.15902</a>. <a href="https://arxiv.org/html/2407.15902v2">arXiv HTML</a></li>
+<li>Probing the Safety Robustness of LLMs in Latent Space. Gu et al. ACL 2026 main, accepted, pp. 21126-21143; earlier version withdrawn from ICLR 2026. <a href="https://aclanthology.org/2026.acl-long.967/">ACL Anthology</a></li>
+<li>NeuroStrike: Neuron-Level Attacks on Aligned LLMs. Wu et al. NDSS 2026, accepted. <a class="id" href="https://arxiv.org/abs/2509.11864">arXiv 2509.11864</a>. <a href="https://research-information.bris.ac.uk/en/publications/neurostrike-neuron-level-attacks-on-aligned-llms/">Bristol portal</a></li>
+<li>Adaptive Probe-based Steering for Robust LLM Jailbreaking. Chen et al. ICML 2026 (venue string &quot;ICML 2026 regular&quot;). <a href="https://openreview.net/forum?id=JKMZyCghr4">OpenReview</a></li>
+<li>RL-Obfuscation: Can Language Models Learn to Evade Latent-Space Monitors? Gupta and Jenner. NeurIPS 2025 workshop only (spotlight); ICLR 2026 main track rejected. <a class="id" href="https://arxiv.org/abs/2506.14261">arXiv 2506.14261</a>. <a href="https://arxiv.org/abs/2506.14261">arXiv</a></li>
+<li>Neural Chameleons. McGuinness et al. ICLR 2026 workshop only; main track desk-rejected. <a href="https://openreview.net/forum?id=JCf1g7IIKW">OpenReview</a></li>
+<li>LatentBreak. Mura et al. arXiv preprint only; ICLR 2026 submission withdrawn. <a class="id" href="https://arxiv.org/abs/2510.08604">arXiv 2510.08604</a>. <a href="https://arxiv.org/abs/2510.08604">arXiv</a></li>
+<li>Robust LLM Safeguarding via Refusal Feature Adversarial Training (ReFAT). Yu et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2409.20089">arXiv 2409.20089</a>. <a href="https://iclr.cc/virtual/2025/poster/28144">iclr.cc</a></li>
+<li>Representation Bending for Large Language Model Safety (RepBend). Yousefpour et al. ACL 2025 Long, accepted, pp. 24073-24098. <a class="id" href="https://arxiv.org/abs/2504.01550">arXiv 2504.01550</a>. <a href="https://aclanthology.org/2025.acl-long.1173">ACL Anthology</a></li>
+<li>Beyond Surface Alignment: Probabilistically Ablating Refusal Direction (DeepRefusal). Xie et al. Findings of EMNLP 2025, accepted, pp. 17620-17632. <a class="id" href="https://arxiv.org/abs/2509.15202">arXiv 2509.15202</a>. <a href="https://openreview.net/forum?id=1gInNlTOMo">OpenReview</a></li>
+<li>Improving LLM Safety Alignment with Dual-Objective Optimization (DOOR). Zhao et al. ICML 2025, accepted. <a class="id" href="https://arxiv.org/abs/2503.03710">arXiv 2503.03710</a>. <a href="https://arxiv.org/abs/2503.03710">arXiv</a></li>
+<li>Safety Alignment Should Be Made More Than Just a Few Tokens Deep. Qi et al. ICLR 2025 Oral, accepted. <a class="id" href="https://arxiv.org/abs/2406.05946">arXiv 2406.05946</a>. <a href="https://www.iclr.cc/virtual/2025/oral/31915">ICLR oral</a></li>
+<li>Refuse Whenever You Feel Unsafe (DeRTa). Yuan et al. ACL 2025 Long, accepted, pp. 3149-3167. <a class="id" href="https://arxiv.org/abs/2407.09121">arXiv 2407.09121</a>. <a href="https://openreview.net/forum?id=1IHrbjfHTB">OpenReview</a></li>
+<li>Any-Depth Alignment (ADA). Zhang et al. ICLR 2026, accepted. <a href="https://openreview.net/forum?id=0fuYOuJyzl">OpenReview</a></li>
+<li>Safety Layers in Aligned LLMs (SPPFT). Li et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2408.17003">arXiv 2408.17003</a>. <a href="https://www.iclr.cc/virtual/2025/poster/28578">iclr.cc</a></li>
+<li>Understanding and Enhancing Safety Mechanisms via Safety-Specific Neuron (SN-Tune). Zhao et al. ICLR 2025, accepted. <a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/6d2666e2cf44088cc57204fbc5ef7f34-Abstract-Conference.html">ICLR proceedings</a></li>
+<li>Superficial Safety Alignment Hypothesis. Li and Kim. ICLR 2026, accepted. <a href="https://openreview.net/forum?id=9yS40pO1RF">OpenReview</a></li>
+<li>GuardSpace: Safety-Sensitive Subspace Meets Harmful-Resistant Null-Space. Zhang et al. ICLR 2026, accepted. <a href="https://openreview.net/forum?id=887vde4ZAW">OpenReview</a></li>
+<li>LoX: Low-Rank Extrapolation Robustifies LLM Safety Against Fine-tuning. Perin et al. COLM 2025, accepted. <a href="https://openreview.net/forum?id=ASS5YD4hL4">OpenReview</a></li>
+<li>RefusalGuard: Geometry-Preserving Fine-Tuning for Safety. Asif and Amiri. COLM 2026, accepted. <a class="id" href="https://arxiv.org/abs/2605.01913">arXiv 2605.01913</a>. <a href="https://openreview.net/forum?id=GaLo7kBiSy">OpenReview</a></li>
+<li>Efficient Safety Alignment via Latent Personality Traits (LPA). Merzouk et al. COLM 2026, accepted. <a href="https://openreview.net/forum?id=TyejBOTa4N">OpenReview</a></li>
+<li>Self-Destructive Language Models (SEAM). Wang et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2505.12186">arXiv 2505.12186</a>. <a href="https://arxiv.org/abs/2505.12186">arXiv</a></li>
+<li>Safeguarding Language Models via Self-Destruct Trapdoor. Katz et al. EACL 2026 Long, accepted, pp. 6939-6958. <a href="https://openreview.net/forum?id=VW7U2kB0rS">OpenReview</a></li>
+<li>AntiDote: Bi-level Adversarial Training for Tamper-Resistant LLMs. Sanyal et al. AAAI 2026, accepted, pp. 32893-32901. <a class="id" href="https://arxiv.org/abs/2509.08000">arXiv 2509.08000</a>. <a href="https://arxiv.org/abs/2509.08000">arXiv</a></li>
+<li>Booster: Tackling Harmful Fine-tuning via Attenuating Harmful Perturbation. Huang et al. ICLR 2025 Oral, accepted. <a class="id" href="https://arxiv.org/abs/2409.01586">arXiv 2409.01586</a>. <a href="https://proceedings.iclr.cc/paper_files/paper/2025/file/a7ac8a21e5a27e7ab31a5f42a0117bdb-Paper-Conference.pdf">ICLR PDF</a></li>
+<li>Antibody: Strengthening Defense Against Harmful Fine-Tuning. Nguyen et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2603.00498">arXiv 2603.00498</a>. <a href="https://openreview.net/forum?id=qur2ef8MqQ">OpenReview</a></li>
+<li>Decoy Direction Optimization (DDO). Muhamed et al. COLM 2026 workshop only. <a href="https://openreview.net/forum?id=f6EnMQBKFh">OpenReview</a></li>
+<li>Abliteration Mitigation via Refusal Aliases (AMRA). Truong. ICML 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2608.18093">arXiv 2608.18093</a>. <a href="https://icml.cc/virtual/2026/79312">icml.cc</a></li>
+<li>A Granular Study of Safety Pretraining under Model Abliteration. Agnihotri et al. NeurIPS 2025 workshop only. <a class="id" href="https://arxiv.org/abs/2510.02768">arXiv 2510.02768</a>. <a href="https://arxiv.org/abs/2510.02768">arXiv</a></li>
+<li>Latent Adversarial Training Improves the Representation of Refusal. Abbas et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2504.18872">arXiv 2504.18872</a>. <a href="https://arxiv.org/abs/2504.18872v1">arXiv</a></li>
+<li>Catastrophic Failure of LLM Unlearning via Quantization. Zhang et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.16454">arXiv 2410.16454</a>. <a href="https://arxiv.org/abs/2410.16454">arXiv</a></li>
+<li>Unlearning or Obfuscating? Benign Relearning. Hu et al. ICLR 2025, accepted, pp. 8857-8888. <a class="id" href="https://arxiv.org/abs/2406.13356">arXiv 2406.13356</a>. <a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/18fd48d9cbbf9a20e434c9d3db6973c5-Abstract-Conference.html">ICLR proceedings</a></li>
+<li>Unlearning Isn&#x27;t Deletion: Reversibility of Machine Unlearning. Xu et al. ICML 2026, accepted; ICLR 2026 submission rejected. <a class="id" href="https://arxiv.org/abs/2505.16831">arXiv 2505.16831</a>. <a href="https://arxiv.org/abs/2505.16831">arXiv</a></li>
+<li>Unlearning Isn&#x27;t Invisible: Detecting Unlearning Traces. Chen et al. ICLR 2026, accepted. <a href="https://openreview.net/forum?id=bqEnnzfhBZ">OpenReview</a></li>
+<li>Watch the Weights: Unsupervised Monitoring and Control of Fine-tuned LLMs. Zhong and Raghunathan. ICLR 2026, accepted. <a href="https://openreview.net/forum?id=WZYxJhvAvD">OpenReview</a></li>
+<li>Distillation Robustifies Unlearning (UNDO). Lee et al. NeurIPS 2025 spotlight, accepted. <a class="id" href="https://arxiv.org/abs/2506.06278">arXiv 2506.06278</a>. <a href="https://arxiv.org/abs/2506.06278">arXiv</a></li>
+<li>Towards LLM Unlearning Resilient to Relearning Attacks. Fan et al. ICML 2025, accepted. <a class="id" href="https://arxiv.org/abs/2502.05374">arXiv 2502.05374</a>. <a href="https://openreview.net/forum?id=zZjLv6F0Ks">OpenReview</a></li>
+<li>Dual-Space Smoothness for Robust and Balanced LLM Unlearning (PRISM). Yan et al. ICLR 2026, accepted. <a href="https://openreview.net/forum?id=VIMW3eys6x">OpenReview</a></li>
+<li>Downgrade to Upgrade: Optimizer Simplification Enhances Robustness. Lang et al. ICLR 2026, accepted. <a href="https://openreview.net/forum?id=Sswng2ToR4">OpenReview</a></li>
+<li>Erasing Conceptual Knowledge from Language Models (ELM). Gandikota et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.02760">arXiv 2410.02760</a>. <a href="https://papers.neurips.cc/paper_files/paper/2025/hash/576c992662ae3df79e4ba269aec79393-Abstract-Conference.html">NeurIPS</a></li>
+<li>On Effects of Steering Latent Representation for LLM Unlearning (Adaptive RMU). Dang et al. AAAI 2025, accepted, pp. 23733-23742. <a class="id" href="https://arxiv.org/abs/2408.06223">arXiv 2408.06223</a>. <a href="https://openreview.net/forum?id=71m6F8taum">OpenReview</a></li>
+<li>Open Technical Problems in Open-Weight AI Model Risk Management. Casper et al. TMLR 2026, accepted with Survey Certification. <a href="https://openreview.net/forum?id=8QyGLnFkzc">OpenReview</a></li>
+<li>Beyond Harmful Fine-Tuning: Open-Weight Safeguards Under Training-Free Tampering. Yu and Ye. ICML 2026 workshop only. <a href="https://openreview.net/forum?id=yj1XQBlvm3">OpenReview</a></li>
+</ol>
+</details>
+<details class="refs"><summary>White-box monitoring and probes<small>36 entries</small></summary>
+<ol>
+<li>Detecting Strategic Deception with Linear Probes. Goldowsky-Dill et al. (Apollo Research). ICML 2025, accepted, PMLR 267:19755-19786. <a class="id" href="https://arxiv.org/abs/2502.03407">arXiv 2502.03407</a>. <a href="https://proceedings.mlr.press/v267/goldowsky-dill25a.html">PMLR</a></li>
+<li>Are Sparse Autoencoders Useful? A Case Study in Sparse Probing. Kantamneni et al. ICML 2025, accepted, PMLR 267:29018-29049. <a class="id" href="https://arxiv.org/abs/2502.16681">arXiv 2502.16681</a>. <a href="https://proceedings.mlr.press/v267/kantamneni25a.html">PMLR</a></li>
+<li>SAEBench. Karvonen et al. Tagged ICML 2025 accepted in the monitoring note and acceptance-unverified preprint in the steering note. <a class="id" href="https://arxiv.org/abs/2503.09532">arXiv 2503.09532</a>. <a href="https://arxiv.org/abs/2503.09532">arXiv</a></li>
+<li>Detecting High-Stakes Interactions with Activation Probes. McKenzie et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2506.10805">arXiv 2506.10805</a>. <a href="https://arxiv.org/abs/2506.10805">arXiv</a></li>
+<li>LLMs Encode Harmfulness and Refusal Separately. Zhao et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2507.11878">arXiv 2507.11878</a>. <a href="https://arxiv.org/abs/2507.11878">arXiv</a></li>
+<li>Noise Injection Reveals Hidden Capabilities of Sandbagging Language Models. Tice et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2412.01784">arXiv 2412.01784</a>. <a href="https://papers.nips.cc/paper_files/paper/2025/hash/aa95d031f5e151bf8fb402f44bd97054-Abstract-Conference.html">NeurIPS</a></li>
+<li>Among Us: A Sandbox for Measuring and Detecting Agentic Deception. Golechha and Garriga-Alonso. NeurIPS 2025 spotlight, accepted. <a class="id" href="https://arxiv.org/abs/2504.04072">arXiv 2504.04072</a>. <a href="https://arxiv.org/abs/2504.04072">arXiv</a></li>
+<li>Overcoming Sparsity Artifacts in Crosscoders to Interpret Chat-Tuning. Minder et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2504.02922">arXiv 2504.02922</a>. <a href="https://nips.cc/virtual/2025/poster/115169">NeurIPS</a></li>
+<li>Why Do Some Language Models Fake Alignment While Others Don&#x27;t? Sheshadri et al. NeurIPS 2025, accepted per author listing. <a class="id" href="https://arxiv.org/abs/2506.18032">arXiv 2506.18032</a>. <a href="https://arxiv.org/abs/2506.18032">arXiv</a></li>
+<li>JBShield: Defending LLMs from Jailbreak Attacks through Activated Concept Analysis. Zhang et al. USENIX Security 2025, accepted per the paper&#x27;s own statement. <a class="id" href="https://arxiv.org/abs/2502.07557">arXiv 2502.07557</a>. <a href="https://arxiv.org/html/2502.07557v1">arXiv HTML</a></li>
+<li>Narrow Finetuning Leaves Clearly Readable Traces in Activation Differences. Minder et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2510.13900">arXiv 2510.13900</a>. <a href="https://arxiv.org/abs/2510.13900">arXiv</a></li>
+<li>LatentQA: Teaching LLMs to Decode Activations into Natural Language. Pan et al. ICLR 2026, accepted. <a href="https://mlanthology.org/iclr/2026/pan2026iclr-latentqa/">ML Anthology</a></li>
+<li>Looking Inward: Language Models Can Learn About Themselves by Introspection. Binder et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.13787">arXiv 2410.13787</a>. <a href="https://iclr.cc/virtual/2025/poster/28917">iclr.cc</a></li>
+<li>Tell Me About Yourself: LLMs Are Aware of Their Learned Behaviors. Betley et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2501.11120">arXiv 2501.11120</a>. <a href="https://arxiv.org/abs/2501.11120">arXiv</a></li>
+<li>Position: Use Sparse Autoencoders to Discover Unknowns. Peng et al. ICML 2026, accepted. <a href="https://icml.cc/virtual/2026/poster/67050">icml.cc</a></li>
+<li>Open Problems in Mechanistic Interpretability. Sharkey et al. TMLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2501.16496">arXiv 2501.16496</a>. <a href="https://arxiv.org/abs/2501.16496">arXiv</a></li>
+<li>Sparse Autoencoders are Capable LLM Jailbreak Mitigators. Assogba et al. (Apple). ICML 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2602.12418">arXiv 2602.12418</a>. <a href="https://icml.cc/virtual/2026/79439">icml.cc</a></li>
+<li>Constitutional Classifiers. Sharma et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2501.18837">arXiv 2501.18837</a>. <a href="https://arxiv.org/abs/2501.18837">arXiv</a></li>
+<li>Cost-Effective Constitutional Classifiers via Representation Re-use. Cunningham et al. Lab report, non-peer-reviewed. <a href="https://alignment.anthropic.com/2025/cheap-monitors/">Anthropic</a></li>
+<li>Constitutional Classifiers++. Cunningham et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2601.04603">arXiv 2601.04603</a>. <a href="https://arxiv.org/abs/2601.04603">arXiv</a></li>
+<li>Building Production-Ready Probes For Gemini. Kramár et al. (Google DeepMind). arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2601.11516">arXiv 2601.11516</a>. <a href="https://arxiv.org/abs/2601.11516">arXiv</a></li>
+<li>Negative Results for SAEs On Downstream Tasks. Smith et al. (Google DeepMind). Lab report, non-peer-reviewed. <a href="https://www.alignmentforum.org/posts/4uXCAJNuPKtKBsi28/sae-negative-results">Alignment Forum</a></li>
+<li>&quot;Did you lie?&quot; Evaluating Lie Detectors across Model Scale. Cooney et al. (UK AISI). arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2606.12618">arXiv 2606.12618</a>. <a href="https://arxiv.org/abs/2606.12618">arXiv</a></li>
+<li>Evaluating Honesty and Lie Detection Techniques. Wang et al. (Anthropic). Lab report, non-peer-reviewed. <a href="https://alignment.anthropic.com/2025/honesty-elicitation/">Anthropic</a></li>
+<li>Fine-Tuned Lie Detectors Failed to Generalize. Hopkins et al. (Anthropic). Lab report, non-peer-reviewed. <a href="https://alignment.anthropic.com/2026/lie-detectors/">Anthropic</a></li>
+<li>What We Learned Trying to Catch AI Liars. Birardi et al. (EleutherAI). Lab report, non-peer-reviewed. <a href="https://blog.eleuther.ai/aletheia-retrospective/">EleutherAI</a></li>
+<li>White Box Control at UK AISI: Sandbagging Investigations. Bloom et al. Lab report, non-peer-reviewed. <a href="https://www.aisi.gov.uk/research/white-box-control-at-uk-aisi---update-on-sandbagging-investigations">AISI</a></li>
+<li>Emergent Introspective Awareness in Large Language Models. Lindsey (Anthropic). Lab report plus arXiv preprint, no venue found. <a class="id" href="https://arxiv.org/abs/2601.01828">arXiv 2601.01828</a>. <a href="https://transformer-circuits.pub/2025/introspection">Transformer Circuits</a></li>
+<li>Activation Oracles. Karvonen et al. arXiv preprint plus lab report. <a class="id" href="https://arxiv.org/abs/2512.15674">arXiv 2512.15674</a>. <a href="https://alignment.anthropic.com/2025/activation-oracles/">Anthropic</a></li>
+<li>Introspection Adapters. Shenoy et al. arXiv preprint plus lab report. <a class="id" href="https://arxiv.org/abs/2604.16812">arXiv 2604.16812</a>. <a href="https://alignment.anthropic.com/2026/introspection-adapters/">Anthropic</a></li>
+<li>AuditBench. Sheshadri et al. arXiv preprint plus lab report. <a class="id" href="https://arxiv.org/abs/2602.22755">arXiv 2602.22755</a>. <a href="https://alignment.anthropic.com/2026/auditbench/">Anthropic</a></li>
+<li>Auditing Language Models for Hidden Objectives. Marks et al. (Anthropic). arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2503.10965">arXiv 2503.10965</a>. <a href="https://arxiv.org/abs/2503.10965">arXiv</a></li>
+<li>Eliciting Secret Knowledge from Language Models. Cywiński et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2510.01070">arXiv 2510.01070</a>. <a href="https://arxiv.org/abs/2510.01070">arXiv</a></li>
+<li>Convergent Linear Representations of Emergent Misalignment. Soligo et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2506.11618">arXiv 2506.11618</a>. <a href="https://arxiv.org/abs/2506.11618">arXiv</a></li>
+<li>Language Models Are Capable of Metacognitive Monitoring and Control. Ji-An et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2505.13763">arXiv 2505.13763</a>. <a href="https://arxiv.org/abs/2505.13763">arXiv</a></li>
+<li>Attention Probes. Shabalin and Belrose (EleutherAI). Lab report, non-peer-reviewed. <a href="https://blog.eleuther.ai/attention-probes/">EleutherAI</a></li>
+</ol>
+</details>
+<details class="refs"><summary>Latent reasoning and monitorability<small>42 entries</small></summary>
+<ol>
+<li>Chain of Thought Monitorability: A New and Fragile Opportunity for AI Safety. Korbak et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2507.11473">arXiv 2507.11473</a>. <a href="https://arxiv.org/abs/2507.11473">arXiv</a></li>
+<li>Monitoring Monitorability. Guan et al. (OpenAI). ICML 2026 oral, accepted, PMLR v306 pp. 37538-37602. <a class="id" href="https://arxiv.org/abs/2512.18311">arXiv 2512.18311</a>. <a href="https://proceedings.mlr.press/v306/guan26h.html">PMLR</a></li>
+<li>Chain-of-Thought Reasoning In The Wild Is Not Always Faithful. Arcuschin et al. ICML 2026, accepted, PMLR v306 pp. 3354-3405. <a href="https://proceedings.mlr.press/v306/arcuschin26b.html">PMLR</a></li>
+<li>Monitorability as a Free Gift: How RLVR Spontaneously Aligns Reasoning. Xiong et al. ICML 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Monitorability%20as%20a%20Free%20Gift%20RLVR%20Spontaneously%20Aligns%20Reasoning&amp;limit=3">OpenReview</a></li>
+<li>Reasoning Theater: Disentangling Model Beliefs from Chain-of-Thought. Boppana et al. ICML 2026, accepted. <a href="https://icml.cc/virtual/2026/poster/66648">icml.cc</a></li>
+<li>Dynamics Within Latent Chain-of-Thought: An Empirical Study of Causal Structure. Li et al. ICML 2026, accepted. <a class="id" href="https://arxiv.org/abs/2602.08783">arXiv 2602.08783</a>. <a href="https://arxiv.org/abs/2602.08783">arXiv</a></li>
+<li>Mechanisms of Introspective Awareness. Macar et al. ICML 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Mechanisms%20of%20Introspective%20Awareness%20Macar&amp;limit=3">OpenReview</a></li>
+<li>Stabilizing Recurrent Dynamics for Test-Time Scalable Latent Reasoning (STARS). Yang et al. ICML 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Stabilizing%20Recurrent%20Dynamics%20for%20Test-Time%20Scalable%20Latent%20Reasoning%20in%20Looped%20Language%20Models&amp;limit=2">OpenReview</a></li>
+<li>Output Supervision Can Obfuscate the Chain of Thought. Drori et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2511.11584">arXiv 2511.11584</a>. <a href="https://arxiv.org/abs/2511.11584">arXiv</a></li>
+<li>Early Signs of Steganographic Capabilities in Frontier LLMs. Zolkowski et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2507.02737">arXiv 2507.02737</a>. <a href="https://arxiv.org/abs/2507.02737">arXiv</a></li>
+<li>FaithCoT-Bench. Shen et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2510.04040">arXiv 2510.04040</a>. <a href="https://arxiv.org/abs/2510.04040">arXiv</a></li>
+<li>Latent Thinking Optimization. Du et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2509.26314">arXiv 2509.26314</a>. <a href="https://arxiv.org/abs/2509.26314">arXiv</a></li>
+<li>LLMs are Single-threaded Reasoners. Wu et al. ICLR 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Soft%20Thinking%20Unlocking%20the%20Reasoning%20Potential%20of%20LLMs%20in%20Continuous%20Concept%20Space&amp;limit=5">OpenReview</a></li>
+<li>SIM-CoT: Supervised Implicit Chain-of-Thought. Wei et al. ICLR 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=SIM-CoT%20Supervised%20Implicit%20Chain-of-Thought&amp;limit=3">OpenReview</a></li>
+<li>Emergence of Superposition. Zhu et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2509.23365">arXiv 2509.23365</a>. <a href="https://arxiv.org/abs/2509.23365">arXiv</a></li>
+<li>Continuous Chain of Thought Enables Parallel Exploration and Reasoning (CoT2). Gozeten et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2505.23648">arXiv 2505.23648</a>. <a href="https://arxiv.org/abs/2505.23648">arXiv</a></li>
+<li>SwiReasoning. Shi et al. ICLR 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=neuralese%20latent%20reasoning%20interpretability&amp;limit=15">OpenReview</a></li>
+<li>ActivationReasoning: Logical Reasoning in Latent Activation Spaces. Helff et al. ICLR 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=neuralese%20latent%20reasoning%20interpretability&amp;limit=15">OpenReview</a></li>
+<li>CoT Red-Handed: Stress Testing Chain-of-Thought Monitoring. Arnav et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2505.23575">arXiv 2505.23575</a>. <a href="https://arxiv.org/abs/2505.23575">arXiv</a></li>
+<li>LLMs Can Learn and Generalize Steganographic Chain-of-Thought under Process Supervision. Skaf et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2506.01926">arXiv 2506.01926</a>. <a href="https://arxiv.org/abs/2506.01926">arXiv</a></li>
+<li>Scaling up Test-Time Compute with Latent Reasoning (Huginn). Geiping et al. NeurIPS 2025 spotlight, accepted. <a class="id" href="https://arxiv.org/abs/2502.05171">arXiv 2502.05171</a>. <a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/3b01972cf31e6fa0fe29e4b8b5c2a0a1-Abstract-Conference.html">NeurIPS</a></li>
+<li>Soft Thinking. Zhang et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2505.15778">arXiv 2505.15778</a>. <a href="https://neurips.cc/virtual/2025/poster/119330">neurips.cc</a></li>
+<li>Reasoning by Superposition. Zhu et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2505.12514">arXiv 2505.12514</a>. <a href="https://arxiv.org/abs/2505.12514">arXiv</a></li>
+<li>Are Latent Reasoning Models Easily Interpretable? Dilgren and Wiegreffe. COLM 2026, accepted; also ICLR 2026 workshop. <a class="id" href="https://arxiv.org/abs/2604.04902">arXiv 2604.04902</a>. <a href="https://arxiv.org/abs/2604.04902">arXiv</a></li>
+<li>MonitorBench. Wang et al. COLM 2026, accepted. <a class="id" href="https://arxiv.org/abs/2603.28590">arXiv 2603.28590</a>. <a href="https://arxiv.org/abs/2603.28590">arXiv</a></li>
+<li>Legibility is Not Interpretability. Du et al. COLM 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Legibility%20is%20Not%20Interpretability%20Chain-Of-Thought&amp;limit=3">OpenReview</a></li>
+<li>Training Large Language Models to Reason in a Continuous Latent Space (Coconut). Hao et al. COLM 2025, accepted; ICLR 2025 rejected. <a class="id" href="https://arxiv.org/abs/2412.06769">arXiv 2412.06769</a>. <a href="https://arxiv.org/abs/2412.06769">arXiv</a></li>
+<li>CODI: Compressing Chain-of-Thought into Continuous Space. Shen et al. EMNLP 2025 main, accepted. <a class="id" href="https://arxiv.org/abs/2502.21074">arXiv 2502.21074</a>. <a href="https://arxiv.org/abs/2502.21074">arXiv</a></li>
+<li>Unlocking the Black Box of Latent Reasoning. Chang et al. ACL 2026 main, accepted. <a class="id" href="https://arxiv.org/abs/2606.01243">arXiv 2606.01243</a>. <a href="https://arxiv.org/abs/2606.01243">arXiv</a></li>
+<li>Is Chain-of-Thought Reasoning of LLMs a Mirage? Zhao et al. Findings of ACL 2026, accepted. <a class="id" href="https://arxiv.org/abs/2508.01191">arXiv 2508.01191</a>. <a href="https://aclanthology.org/2026.findings-acl.749/">ACL Anthology</a></li>
+<li>Reasoning Beyond Language: Survey on Latent Chain-of-Thought. Chen et al. Findings of EMNLP 2026, accepted per arXiv comments. <a class="id" href="https://arxiv.org/abs/2505.16782">arXiv 2505.16782</a>. <a href="https://arxiv.org/abs/2505.16782">arXiv</a></li>
+<li>Does Out-of-Sight Equal Out-of-Mind in CoT Monitorability? Ferreira et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2608.04928">arXiv 2608.04928</a>. <a href="https://arxiv.org/abs/2608.04928">arXiv</a></li>
+<li>Ulterior Motives: Detecting Misaligned Reasoning in Continuous Thought Models. Ramjee. ICLR 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2604.23460">arXiv 2604.23460</a>. <a href="https://arxiv.org/abs/2604.23460">arXiv</a></li>
+<li>Can We Predict Alignment Before Models Finish Thinking? Chan et al. NeurIPS 2025 workshop only; ICLR 2026 rejected. <a class="id" href="https://arxiv.org/abs/2507.12428">arXiv 2507.12428</a>. <a href="https://arxiv.org/abs/2507.12428">arXiv</a></li>
+<li>Monitoring the Internal Monologue: Probe Trajectories. Chrabaszcz et al. ICML 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2605.18549">arXiv 2605.18549</a>. <a href="https://arxiv.org/abs/2605.18549">arXiv</a></li>
+<li>How Do Latent Reasoning Methods Perform Under Weak and Strong Supervision? Cui et al. ICLR 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2602.22441">arXiv 2602.22441</a>. <a href="https://arxiv.org/abs/2602.22441">arXiv</a></li>
+<li>Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation. Baker et al. (OpenAI). arXiv preprint and lab report. <a class="id" href="https://arxiv.org/abs/2503.11926">arXiv 2503.11926</a>. <a href="https://arxiv.org/abs/2503.11926">arXiv</a></li>
+<li>Reasoning Models Don&#x27;t Always Say What They Think. Chen et al. (Anthropic). arXiv preprint and lab report. <a class="id" href="https://arxiv.org/abs/2505.05410">arXiv 2505.05410</a>. <a href="https://arxiv.org/abs/2505.05410">arXiv</a></li>
+<li>When Chain of Thought is Necessary, Language Models Struggle to Evade Monitors. Emmons et al. (Google DeepMind). arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2507.05246">arXiv 2507.05246</a>. <a href="https://arxiv.org/abs/2507.05246">arXiv</a></li>
+<li>Not All LLM Reasoning is Visible in the Chain-of-Thought. Baherwani et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2607.22925">arXiv 2607.22925</a>. <a href="https://arxiv.org/abs/2607.22925">arXiv</a></li>
+<li>Issue Brief: Chain of Thought Monitorability. Frontier Model Forum. Lab-coalition report, non-peer-reviewed. <a href="https://www.frontiermodelforum.org/uploads/2026/01/FMF-Issue-Brief-on-Chain-of-Thought-Monitorability.pdf">FMF</a></li>
+<li>Policy Options for Preserving Chain of Thought Monitorability. Delaney et al. (IAPS). Policy report, non-peer-reviewed. <a href="https://www.iaps.ai/research/policy-options-for-preserving-cot-monitorability">IAPS</a></li>
+</ol>
+</details>
+<details class="refs"><summary>Agents, multi-agent systems and memory<small>51 entries</small></summary>
+<ol>
+<li>ASIDE: Architectural Separation of Instructions and Data. Zverev et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2503.10566">arXiv 2503.10566</a>. <a href="https://arxiv.org/pdf/2503.10566">arXiv</a></li>
+<li>Instructional Segment Embedding. Wu et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.09102">arXiv 2410.09102</a>. <a href="https://arxiv.org/abs/2410.09102">arXiv</a></li>
+<li>Monitoring Decomposition Attacks with Lightweight Sequential Monitors. Yueh-Han et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2506.10949">arXiv 2506.10949</a>. <a href="https://arxiv.org/html/2506.10949v1">arXiv</a></li>
+<li>Reliable Weak-to-Strong Monitoring of LLM Agents. Kale et al. ICLR 2026 oral, accepted. <a class="id" href="https://arxiv.org/abs/2508.19461">arXiv 2508.19461</a>. <a href="https://iclr.cc/virtual/2026/oral/10009050">iclr.cc</a></li>
+<li>Cache-to-Cache: Direct Semantic Communication Between LLMs. Fu et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2510.03215">arXiv 2510.03215</a>. <a href="https://iclr.cc/virtual/2026/poster/10010020">iclr.cc</a></li>
+<li>KVComm: Efficient LLM Communication through Selective KV Sharing. Shi et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2510.03346">arXiv 2510.03346</a>. <a href="https://iclr.cc/virtual/2026/poster/10010626">iclr.cc</a></li>
+<li>Your Agent May Misevolve: Emergent Risks in Self-evolving LLM Agents. Shao et al. ICLR 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Your%20Agent%20May%20Misevolve%20Emergent%20Risks%20in%20Self-evolving%20LLM%20Agents&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>Adaptive Attacks on Trusted Monitors Subvert AI Control Protocols. Terekhov et al. ICLR 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Adaptive%20Attacks%20on%20Trusted%20Monitors%20Subvert%20AI%20Control%20Protocols&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>Emergent Misalignment is Easy, Narrow Misalignment is Hard. Soligo et al. (recorded as Turner et al. in the monitoring note, title-only verification). ICLR 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=Emergent%20Misalignment%20is%20Easy%20Narrow%20Misalignment%20is%20Hard&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>Latent Collaboration in Multi-Agent Systems (LatentMAS). Zou et al. ICML 2026 spotlight, accepted, PMLR v306 pp. 168813-168847. <a class="id" href="https://arxiv.org/abs/2511.20639">arXiv 2511.20639</a>. <a href="https://proceedings.mlr.press/v306/zou26k.html">PMLR</a></li>
+<li>A-MemGuard: A Proactive Defense Framework for LLM-Based Agent Memory. Wei et al. ICML 2026, accepted; ICLR 2026 rejected. <a class="id" href="https://arxiv.org/abs/2510.02373">arXiv 2510.02373</a>. <a href="https://icml.cc/virtual/2026/poster/61006">icml.cc</a></li>
+<li>SafeHarbor: Hierarchical Memory-Augmented Guardrail. Liu et al. ICML 2026, accepted. <a class="id" href="https://arxiv.org/abs/2605.05704">arXiv 2605.05704</a>. <a href="https://arxiv.org/pdf/2605.05704">arXiv</a></li>
+<li>BLOCK-EM: Preventing Emergent Misalignment via Latent Blocking. Ustaomeroglu and Qu. ICML 2026, accepted. <a href="https://api2.openreview.net/notes/search?term=BLOCK-EM%20Preventing%20Emergent%20Misalignment%20via%20Latent%20Blocking&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>State-Dependent Safety Failures in Multi-Turn Language Model Interaction (STAR). Li et al. ICML 2026 (venue label only, no decision field visible). <a href="https://api2.openreview.net/notes/search?term=State-Dependent%20Safety%20Failures%20in%20Multi-Turn%20Language%20Model%20Interaction&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>Memory Injection Attacks on LLM Agents via Query-Only Interaction (MINJA). Dong et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2503.03704">arXiv 2503.03704</a>. <a href="https://arxiv.org/html/2503.03704v5">arXiv</a></li>
+<li>Thought Communication in Multiagent Collaboration. Zheng et al. NeurIPS 2025 spotlight, accepted. <a class="id" href="https://arxiv.org/abs/2510.20733">arXiv 2510.20733</a>. <a href="https://arxiv.org/html/2510.20733v1">arXiv</a></li>
+<li>Enabling Agents to Communicate Entirely in Latent Space (Interlat). Du et al. ACL 2026 long, accepted; ICLR 2026 submission withdrawn. <a class="id" href="https://arxiv.org/abs/2511.09149">arXiv 2511.09149</a>. <a href="https://preview.aclanthology.org/ingest-acl/2026.acl-long.1248/">ACL Anthology</a></li>
+<li>X-Boundary: Establishing Exact Safety Boundary. Lu et al. Findings of EMNLP 2025, accepted. <a class="id" href="https://arxiv.org/abs/2502.09990">arXiv 2502.09990</a>. <a href="https://arxiv.org/abs/2502.09990">arXiv</a></li>
+<li>Defending against Indirect Prompt Injection by Instruction Detection. Wen et al. Findings of EMNLP 2025, accepted, pp. 19472-19487. <a class="id" href="https://arxiv.org/abs/2505.06311">arXiv 2505.06311</a>. <a href="https://arxiv.org/abs/2505.06311v2">arXiv</a></li>
+<li>Attention Tracker. Hung et al. Findings of NAACL 2025, accepted, pp. 2309-2322. <a class="id" href="https://arxiv.org/abs/2411.00348">arXiv 2411.00348</a>. <a href="https://preview.aclanthology.org/new-sigs/2025.findings-naacl.123/">ACL Anthology</a></li>
+<li>Get my drift? Catching LLM Task Drift with Activation Deltas. Abdelnabi et al. SaTML 2025, accepted. <a class="id" href="https://arxiv.org/abs/2406.00799">arXiv 2406.00799</a>. <a href="https://arxiv.org/abs/2406.00799v2">arXiv</a></li>
+<li>Steering Awareness: Detecting Activation Steering from Within. Fonseca Rivera and Africa. COLM 2026, accepted (inferred from OpenReview). <a class="id" href="https://arxiv.org/abs/2511.21399">arXiv 2511.21399</a>. <a href="https://arxiv.org/pdf/2511.21399">arXiv</a></li>
+<li>StateBridge. Peng et al. COLM 2026, accepted (inferred from OpenReview). <a href="https://api2.openreview.net/notes/search?term=StateBridge%20Training-free%20Hidden-state%20Alignment%20Latent%20Communication%20LLM%20Multi-Agent%20Systems&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>A Representation Engineering Perspective on Multi-Turn Jailbreaks. Bullwinkel et al. ICML 2025 workshop only. <a class="id" href="https://arxiv.org/abs/2507.02956">arXiv 2507.02956</a>. <a href="https://arxiv.org/pdf/2507.02956">arXiv</a></li>
+<li>Safe in Isolation, Dangerous Together: Agent-Driven Multi-Turn Decomposition Jailbreaks. Srivastav et al. ACL 2025 workshop only (REALM), pp. 170-183. <a href="https://aclanthology.org/2025.realm-1.13">ACL Anthology</a></li>
+<li>Hidden in Plain Sight: DecompBench. Kothamasu et al. ICML 2026 and NeurIPS 2026 workshops only. <a class="id" href="https://arxiv.org/abs/2606.13994">arXiv 2606.13994</a>. <a href="https://arxiv.org/pdf/2606.13994">arXiv</a></li>
+<li>Chat-safe is not CUA-safe. Koduru et al. NeurIPS 2026 workshop only. <a href="https://neurips.cc/virtual/2026/168136">neurips.cc</a></li>
+<li>Exposure Is Not Commitment. Sinha. NeurIPS 2026 workshop only. <a href="https://neurips.cc/virtual/2026/168194">neurips.cc</a></li>
+<li>Internal-State Probes Read the Situation, Not the Action. Fomin et al. ICML 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2606.30449">arXiv 2606.30449</a>. <a href="https://arxiv.org/abs/2606.30449">arXiv</a></li>
+<li>PaaT: Probe as a Tool for Proprioceptive Language Agents. Cho et al. ICML 2026 workshop only. <a href="https://icml.cc/virtual/2026/77894">icml.cc</a></li>
+<li>Controlling Tool Use with Heading-Specific Activation Steering. Chen et al. ICML 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2607.05790">arXiv 2607.05790</a>. <a href="https://arxiv.org/abs/2607.05790">arXiv</a></li>
+<li>Probing the Misaligned Thinking Process of Language Models. Zhou et al. ICML 2026 workshop only. <a class="id" href="https://arxiv.org/abs/2606.24251">arXiv 2606.24251</a>. <a href="https://arxiv.org/abs/2606.24251">arXiv</a></li>
+<li>What the Monitor Saw: Activations, Pooling, and Evidence Combination. Crabb. NeurIPS 2026 workshop only. <a href="https://api2.openreview.net/notes/search?term=What%20the%20Monitor%20Saw%20activations%20pooling%20evidence%20combination%20AI%20control%20cascades&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>Detecting Multi-Agent Collusion Through Multi-Agent Interpretability. Rose et al. NeurIPS 2026 workshop only; ICLR 2027 under review. <a href="https://api2.openreview.net/notes/search?term=Detecting%20Multi-Agent%20Collusion%20Through%20Multi-Agent%20Interpretability&amp;type=terms&amp;source=forum">OpenReview</a></li>
+<li>Tool Use Enables Undetectable Steganography in Multi-Agent LLM Systems. Rippin et al. NeurIPS 2026 workshop records only. <a class="id" href="https://arxiv.org/abs/2606.28425">arXiv 2606.28425</a>. <a href="https://arxiv.org/abs/2606.28425">arXiv</a></li>
+<li>Caught in the Act / Telling FIBS. Hollinsworth et al. ICLR 2027 under review. <a class="id" href="https://arxiv.org/abs/2610.12445">arXiv 2610.12445</a>. <a href="https://arxiv.org/html/2610.12445">arXiv</a></li>
+<li>LCGuard: Latent Communication Guard for Safe KV Sharing. Asif et al. ICLR 2027 under review. <a class="id" href="https://arxiv.org/abs/2605.22786">arXiv 2605.22786</a>. <a href="https://arxiv.org/abs/2605.22786">arXiv</a></li>
+<li>Remembering More, Risking More: Longitudinal Safety Risks in Memory-Equipped Agents. Al-Tawaha et al. ICLR 2027 under review. <a class="id" href="https://arxiv.org/abs/2605.17830">arXiv 2605.17830</a>. <a href="https://arxiv.org/pdf/2605.17830">arXiv</a></li>
+<li>Activation Steering Induces Emergent Misalignment. Cao et al. ICLR 2027 under review. <a class="id" href="https://arxiv.org/abs/2606.08682">arXiv 2606.08682</a>. <a href="https://arxiv.org/abs/2606.08682">arXiv</a></li>
+<li>SafeDream: Safety World Model for Proactive Early Jailbreak Detection. Yan et al. ACL ARR under review. <a class="id" href="https://arxiv.org/abs/2604.16824">arXiv 2604.16824</a>. <a href="https://arxiv.org/pdf/2604.16824">arXiv</a></li>
+<li>Safety of Latent Communication in Multi-Agent Systems. Huzaifa et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2609.39788">arXiv 2609.39788</a>. <a href="https://arxiv.org/abs/2609.39788">arXiv</a></li>
+<li>When Latent Agents Lie: KV-Cache Integrity. Brito and Baquero. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2606.28958">arXiv 2606.28958</a>. <a href="https://arxiv.org/abs/2606.28958">arXiv</a></li>
+<li>Stateful Online Monitoring Catches Distributed Agent Attacks. Brown et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2605.31593">arXiv 2605.31593</a>. <a href="https://arxiv.org/pdf/2605.31593">arXiv</a></li>
+<li>On the Inseparability of Instructions and Data in Shared-Embedding Sequence Models. Pant et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2606.27567">arXiv 2606.27567</a>. <a href="https://arxiv.org/abs/2606.27567">arXiv</a></li>
+<li>Activation Steering Transfer to Agents. Pinto. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2607.09156">arXiv 2607.09156</a>. <a href="https://arxiv.org/abs/2607.09156">arXiv</a></li>
+<li>ARGUS: Defending Against Multimodal Indirect Prompt Injection. Lu et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2512.05745">arXiv 2512.05745</a>. <a href="https://arxiv.org/abs/2512.05745">arXiv</a></li>
+<li>Bypassing Prompt Injection Detectors through Evasive Injections. Rahman and Alouani. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2602.00750">arXiv 2602.00750</a>. <a href="https://arxiv.org/html/2602.00750v1">arXiv</a></li>
+<li>Open Challenges in Multi-Agent Security. Schroeder de Witt et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2505.02077">arXiv 2505.02077</a>. <a href="https://arxiv.org/pdf/2505.02077">arXiv</a></li>
+<li>Adversaries Can Misuse Combinations of Safe Models. Jones et al. Background, 2024. <a class="id" href="https://arxiv.org/abs/2406.14595">arXiv 2406.14595</a>. <a href="https://arxiv.org/abs/2406.14595">arXiv</a></li>
+<li>Simple Probes Can Catch Sleeper Agents. MacDiarmid et al. (Anthropic). Lab report, non-peer-reviewed. <a href="https://anthropic.com/research/probes-catch-sleeper-agents">Anthropic</a></li>
+<li>A Global Workspace in Language Models. Anthropic Interpretability team. Lab report, non-peer-reviewed. <a href="https://www.anthropic.com/research/global-workspace">Anthropic</a></li>
+</ol>
+</details>
+<details class="refs"><summary>Multimodal and VLM latent safety<small>46 entries</small></summary>
+<ol>
+<li>Cross-Modal Safety Mechanism Transfer in LVLMs (TGA). Xu et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.12662">arXiv 2410.12662</a>. <a href="https://arxiv.org/html/2410.12662v2">arXiv HTML</a></li>
+<li>ETA: Evaluating Then Aligning Safety of VLMs at Inference Time. Ding et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.06625">arXiv 2410.06625</a>. <a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/06f9fe2915857be2b1e369419a531ad3-Abstract-Conference.html">ICLR proceedings</a></li>
+<li>SAFREE. Yoon et al. ICLR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2410.12761">arXiv 2410.12761</a>. <a href="https://iclr.cc/virtual/2025/poster/28752">iclr.cc</a></li>
+<li>Internal Activation Revision. Li et al. AAAI 2025, accepted, pp. 27428-27436. <a class="id" href="https://arxiv.org/abs/2501.16378">arXiv 2501.16378</a>. <a href="https://arxiv.org/html/2501.16378v1">arXiv HTML</a></li>
+<li>Steering Away from Harm (ASTRA). Wang et al. CVPR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2411.16721">arXiv 2411.16721</a>. <a href="https://cvpr.thecvf.com/virtual/2025/poster/33840">CVPR</a></li>
+<li>Do We Really Need Curated Malicious Data for Safety Alignment in Multi-modal LLMs? Wang et al. CVPR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2504.10000">arXiv 2504.10000</a>. <a href="https://cvpr.thecvf.com/virtual/2025/poster/33133">CVPR</a></li>
+<li>Immune. Ghosal et al. CVPR 2025, accepted. <a class="id" href="https://arxiv.org/abs/2411.18688">arXiv 2411.18688</a>. <a href="https://arxiv.org/abs/2411.18688">arXiv</a></li>
+<li>HiddenDetect. Jiang et al. ACL 2025 main, accepted, pp. 14880-14893. <a class="id" href="https://arxiv.org/abs/2502.14744">arXiv 2502.14744</a>. <a href="https://aclanthology.org/2025.acl-long.724">ACL Anthology</a></li>
+<li>Unraveling and Mitigating Safety Alignment Degradation of VLMs (CMRM). Liu et al. Findings of ACL 2025, accepted, pp. 3631-3643. <a class="id" href="https://arxiv.org/abs/2410.09047">arXiv 2410.09047</a>. <a href="https://preview.aclanthology.org/setup/2025.findings-acl.186">ACL Anthology</a></li>
+<li>VSCBench. Geng et al. Findings of ACL 2025, accepted, pp. 3047-3059. <a href="https://preview.aclanthology.org/setup/2025.findings-acl.158">ACL Anthology</a></li>
+<li>Layer-wise Alignment (ICET and L-PPO). Bachu et al. ICML 2025 spotlight, accepted, PMLR 267:2310-2334. <a class="id" href="https://arxiv.org/abs/2411.04291">arXiv 2411.04291</a>. <a href="https://proceedings.mlr.press/v267/bachu25a.html">PMLR</a></li>
+<li>SAeUron. Cywiński and Deja. ICML 2025, accepted, PMLR 267:11738-11775. <a class="id" href="https://arxiv.org/abs/2501.18052">arXiv 2501.18052</a>. <a href="https://proceedings.mlr.press/v267/cywinski25a.html">PMLR</a></li>
+<li>Understanding and Rectifying Safety Perception Distortion in VLMs (ShiftDC). Zou et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2502.13095">arXiv 2502.13095</a>. <a href="https://neurips.cc/virtual/2025/poster/118667">neurips.cc</a></li>
+<li>JailBound. Song et al. NeurIPS 2025, accepted. <a class="id" href="https://arxiv.org/abs/2505.19610">arXiv 2505.19610</a>. <a href="https://neurips.cc/virtual/2025/poster/115121">neurips.cc</a></li>
+<li>Jailbreak-AudioBench. Cheng et al. NeurIPS 2025 Datasets and Benchmarks, accepted. <a href="https://papers.neurips.cc/paper_files/paper/2025/hash/0ff38d72a2e0aa6dbe42de83a17b2223-Abstract-Datasets_and_Benchmarks_Track.html">NeurIPS</a></li>
+<li>Automating Steering for Safe Multimodal LLMs (AutoSteer). Wu et al. EMNLP 2025 main, accepted, pp. 792-814. <a class="id" href="https://arxiv.org/abs/2507.13255">arXiv 2507.13255</a>. <a href="https://preview.aclanthology.org/setup/2025.emnlp-main.41">ACL Anthology</a></li>
+<li>How Jailbreak Defenses Work and Ensemble? Long et al. Findings of EMNLP 2025, accepted, pp. 21263-21290. <a href="https://preview.aclanthology.org/dashboard/2025.findings-emnlp.1160">ACL Anthology</a></li>
+<li>Activation Steering Meets Preference Optimization (SPO-VLM). Wu et al. ACML 2025, accepted, PMLR 304:17-32. <a class="id" href="https://arxiv.org/abs/2509.00373">arXiv 2509.00373</a>. <a href="https://proceedings.mlr.press/v304/wu26a.html">PMLR</a></li>
+<li>From &quot;Sure&quot; to &quot;Sorry&quot;: JailNeurons / JDJN. Gan et al. ICLR 2026, accepted (paper header). <a href="https://openreview.net/pdf/b3c7570ad002773ee012e880592f60b6c62cd048.pdf">OpenReview PDF</a></li>
+<li>Safety Mirage. Chen et al. ICLR 2026, accepted. <a class="id" href="https://arxiv.org/abs/2503.11832">arXiv 2503.11832</a>. <a href="https://iclr.cc/virtual/2026/poster/10009564">iclr.cc</a></li>
+<li>Toward Universal and Transferable Jailbreak Attacks on VLMs (UltraBreak). Cui et al. ICLR 2026, accepted, pp. 121004-121023. <a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/c4d26a95fd83f8e590f81c54ae670b5d-Abstract-Conference.html">ICLR proceedings</a></li>
+<li>Jailbreaking Vision-Language Models Through the Visual Modality. Azulay et al. ICML 2026 per the paper&#x27;s own header, not independently verified. <a class="id" href="https://arxiv.org/abs/2605.00583">arXiv 2605.00583</a>. <a href="https://arxiv.org/pdf/2605.00583">arXiv</a></li>
+<li>ImgTrojan. Tao et al. NAACL 2025 Long, accepted, pp. 7048-7063. <a href="https://preview.aclanthology.org/moar-dois/2025.naacl-long.360.pdf">ACL Anthology</a></li>
+<li>SIUO. Wang et al. Findings of NAACL 2025, accepted. <a class="id" href="https://arxiv.org/abs/2406.15279">arXiv 2406.15279</a>. <a href="https://arxiv.org/abs/2406.15279">arXiv</a></li>
+<li>SafetyReminder (SAPT). Tang et al. AAAI 2026, accepted.</li>
+<li>SafeSteer: Adaptive Subspace Steering for Jailbreak Defense in VLMs. Zeng et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2509.21400">arXiv 2509.21400</a>. <a href="https://arxiv.org/abs/2509.21400">arXiv</a></li>
+<li>Attention Misses Visual Risk: Risk-Adaptive Steering (RAS / MoRAS). Park et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2510.13698">arXiv 2510.13698</a>. <a href="https://arxiv.org/abs/2510.13698">arXiv</a></li>
+<li>Principled Steering via Null-space Projection (NullSteer). Zhu et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2603.22094">arXiv 2603.22094</a>. <a href="https://arxiv.org/html/2603.22094v2">arXiv HTML</a></li>
+<li>Understanding and Defending VLM Jailbreaks via Jailbreak-Related Representation Shift (JRS-Rem). Wei et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2603.17372">arXiv 2603.17372</a>. <a href="https://arxiv.org/abs/2603.17372">arXiv</a></li>
+<li>Harnessing Textual Refusal Directions for Multimodal Safety (MARS). D&#x27;Incà et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2606.31876">arXiv 2606.31876</a>. <a href="https://arxiv.org/abs/2606.31876">arXiv</a></li>
+<li>Diagnosing and Repairing Unsafe Channels in VLMs (CARE). Fu et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2603.27240">arXiv 2603.27240</a>. <a href="https://arxiv.org/abs/2603.27240">arXiv</a></li>
+<li>Dictionary-Aligned Concept Control (DACO). Luo et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2604.08846">arXiv 2604.08846</a>. <a href="https://arxiv.org/abs/2604.08846">arXiv</a></li>
+<li>A Cross-Architecture Audit of Direction-Based Inference-Time Defences in VLMs. Yin et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2607.27910">arXiv 2607.27910</a>. <a href="https://arxiv.org/abs/2607.27910">arXiv</a></li>
+<li>VISOR++: Universal Visual Inputs based Steering for Large VLMs. Balakrishnan and Phute. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2509.25533">arXiv 2509.25533</a>. <a href="https://arxiv.org/pdf/2509.25533">arXiv</a></li>
+<li>Con Instruction: Universal Jailbreaking via Non-Textual Modalities. Geng et al. Venue unverified. <a class="id" href="https://arxiv.org/abs/2506.00548">arXiv 2506.00548</a>. <a href="https://arxiv.org/pdf/2506.00548">arXiv</a></li>
+<li>LoMC: Localized Multidirectional Correction for Refusal Suppression. Hong et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2606.13709">arXiv 2606.13709</a>. <a href="https://arxiv.org/pdf/2606.13709">arXiv</a></li>
+<li>Bootstrapping LLM Robustness for VLM Safety via Reducing the Pretraining Modality Gap. Yang et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2505.24208">arXiv 2505.24208</a>. <a href="https://arxiv.org/abs/2505.24208v1">arXiv</a></li>
+<li>SEA: Low-Resource Safety Alignment via Synthetic Embeddings. Lu et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2502.12562">arXiv 2502.12562</a>. <a href="https://arxiv.org/abs/2502.12562">arXiv</a></li>
+<li>Concept-Based Dictionary Learning for Inference-Time Safety in Vision Language Action Models. Wen et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2602.01834">arXiv 2602.01834</a>. <a href="https://arxiv.org/abs/2602.01834">arXiv</a></li>
+<li>CEE: Inference-Time Jailbreak Defense for Embodied Intelligence. Yang et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2504.13201">arXiv 2504.13201</a>. <a href="https://arxiv.org/abs/2504.13201">arXiv</a></li>
+<li>Narrow Fine-Tuning Erodes Safety Alignment in Vision-Language Agents. Gulati and Raval. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2602.16931">arXiv 2602.16931</a>. <a href="https://arxiv.org/abs/2602.16931">arXiv</a></li>
+<li>SARSteer: Safeguarding Large Audio-Language Models via Safe-Ablated Refusal Steering. Lin et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2510.17633">arXiv 2510.17633</a>. <a href="https://arxiv.org/abs/2510.17633">arXiv</a></li>
+<li>SPIRIT: Patching Speech Language Models against Jailbreak Attacks. Djanibekov et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2505.13541">arXiv 2505.13541</a>. <a href="https://arxiv.org/abs/2505.13541">arXiv</a></li>
+<li>OmniGuard. Verma et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2505.23856">arXiv 2505.23856</a>. <a href="https://arxiv.org/abs/2505.23856">arXiv</a></li>
+<li>MOSSBench. Li et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2406.17806">arXiv 2406.17806</a>. <a href="https://arxiv.org/abs/2406.17806">arXiv</a></li>
+<li>DUAL-Bench. Ren et al. arXiv preprint only. <a class="id" href="https://arxiv.org/abs/2510.10846">arXiv 2510.10846</a>. <a href="https://arxiv.org/abs/2510.10846v2">arXiv</a></li>
+</ol>
+</details>
+</section>
+
+<footer>
+  <p>Coverage: January 2025 to October 2026, with 2024 work as background. Acceptance status was verified against proceedings pages, PMLR volumes, the ACL Anthology, conference virtual sites and OpenReview venue fields; see <a href="#scope">verification scope</a> for the lists that could not be checked.</p>
+  <p>Quotations from sources are kept under fifteen words; all other claims are paraphrased, and every figure is taken from the paper named beside it.</p>
+</footer>
+</main>
+</div>
+</div>
+<script>
+(function () {
+  var links = document.querySelectorAll('#railnav a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        if (current) current.classList.remove('current');
+        current = map[e.target.id];
+        if (current) current.classList.add('current');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+  Object.keys(map).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+})();
+</script>
+<script>
+    // Theme toggle (auto / light / dark), shared with the home page through the same storage key
+    (function(){
+      const root = document.documentElement;
+      const label = document.getElementById('themeLabel');
+      const KEY = 'theme-pref-vdd', MODES = ['auto', 'light', 'dark'];
+      let mode = 'light';
+      try { mode = localStorage.getItem(KEY) || 'light'; } catch(e){}
+      if (!MODES.includes(mode)) mode = 'light';
+      const apply = (m) => {
+        if (m === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', m);
+        label.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+      };
+      apply(mode);
+      document.getElementById('themeBtn').addEventListener('click', () => {
+        mode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
+        try { localStorage.setItem(KEY, mode); } catch(e){}
+        apply(mode);
+      });
+    })();
+  </script>
+</body>
+</html>

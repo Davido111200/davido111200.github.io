@@ -161,11 +161,6 @@
 
     .tools{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border)}
     .chip{font-size:.78rem; padding:.18rem .6rem; border-radius:999px; background:var(--surface-2); color:var(--muted)}
-    .log-sub{font-size:.92rem; color:var(--muted); margin:.2rem 0 .6rem}
-    .log-table{width:100%; border-collapse:collapse; font-size:.88rem; margin:.6rem 0}
-    .log-table th,.log-table td{padding:.35rem .5rem; border-bottom:1px solid var(--border); text-align:left}
-    .log-table th{color:var(--muted); font-weight:600; white-space:nowrap}
-    .log-table td.num{text-align:right; font-variant-numeric:tabular-nums}
 
     /* ===== Lists (news, publications, grants, service) ===== */
     .list{display:grid}
@@ -331,10 +326,6 @@
           <h2 id="news-title">News</h2>
           <div class="list" id="newsList">
             <div class="item">
-              <time datetime="2026-11">Nov 2026</time>
-              <div>🔬 Dependency-graph defence for our agent decomposition benchmark: graph treatment arms land within the annotation noise floor (κ = 0.94 same-model, 0.80 cross-family) — see the <a href="#log">research log</a></div>
-            </div>
-            <div class="item">
               <time datetime="2026-10">Oct 2026</time>
               <div>📖 New reading: <a href="readings/latent-space-ai-safety-2025-2026/">Latent-space AI safety, January 2025 to October 2026</a>, a literature review of about 300 papers with every entry tagged by acceptance status</div>
             </div>
@@ -417,21 +408,6 @@
           </button>
         </section>
 
-        <section id="log" aria-labelledby="log-title">
-          <h2 id="log-title">Research Log</h2>
-          <h3>Dependency-graph generation for agent decomposition benchmarks <span class="chip">Nov 2026</span></h3>
-          <p class="log-sub">How much of a multi-agent benchmark's measured behaviour is mechanism, and how much is an artefact of the LLM-annotated dependency graph?</p>
-          <p>For our 50-case decomposition benchmark we treat the graph as a measured, defended object: each graph is a single-model annotation (Claude Sonnet 5) over hash-pinned published subtasks, byte-replayable with per-case request/response hashes. Quality is measured, not assumed — same-model re-annotation gives Cohen's κ = 0.940 (30/46 exact matches; ~10% of edges flip per sampling draw, our declared noise floor), a cross-family annotator gives κ = 0.798, and counterfactual edge ablation certifies which edges are behaviourally load-bearing.</p>
-          <table class="log-table">
-            <thead><tr><th>Graph-as-treatment arm (same tasks, backbone, frozen protocol)</th><th class="num">Confirmed subtasks % (LB)</th><th class="num">Full-task completions</th><th class="num">Rubric credit % (LB)</th><th class="num">Worker overlap</th></tr></thead>
-            <tbody>
-              <tr><td>Annotated graph (shipped)</td><td class="num">19.3</td><td class="num">2 / 50</td><td class="num">18.5</td><td class="num">27</td></tr>
-              <tr><td>Transitive-reduced graph</td><td class="num">23.1</td><td class="num">1 / 50</td><td class="num">16.7</td><td class="num">28</td></tr>
-              <tr><td>No graph (strictly serial)</td><td class="num">18.4</td><td class="num">1 / 50</td><td class="num">10.4</td><td class="num">0</td></tr>
-            </tbody>
-          </table>
-          <p>Swapping the annotated graph for its transitive reduction — or removing it entirely, which forces strictly serial execution — moves confirmed subtask completion only within 18.4–23.1%, inside the ~10% annotation noise floor: the benchmark's conclusions are not an artefact of one graph draw. One engineering caution from the same study: a null-annotation bug silently zeroed every case in the no-graph arm while masquerading as a "tools not ready" canary stop; it is fixed and now gated at generation time.</p>
-        </section>
         <section id="analytics" aria-labelledby="analytics-title">
           <h2 id="analytics-title">Visitors</h2>
           <p class="muted">Live view of where visitors are coming from.</p>
